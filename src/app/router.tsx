@@ -2,6 +2,7 @@
 import { createBrowserRouter, Navigate, RouteObject } from 'react-router-dom';
 import { LoginPage } from './routes/login';
 import { HomePage } from './routes/home';
+import { SaleDashboardPage } from './routes/sale-dashboard'
 import { AboutPage } from './routes/about';
 import { ContactPage } from './routes/contact';
 import { RegisterPage } from './routes/register';
@@ -50,7 +51,7 @@ const routes: RouteObject[] = [
       },
     ]
   },
-  
+
   // Dashboard routes (with sidebar)
   {
     path: '/',
@@ -65,8 +66,8 @@ const routes: RouteObject[] = [
         element: <HomePage />,
       },
       {
-        path: '/profile',
-        element: <div>User Profile</div>,
+        path: '/sale-dashboard',
+        element: <SaleDashboardPage />,
       },
       {
         path: '/analytics',
@@ -86,7 +87,7 @@ const routes: RouteObject[] = [
       },
     ],
   },
-  
+
   // Main layout routes (with navbar and footer but no sidebar)
   {
     path: '/',
@@ -102,7 +103,7 @@ const routes: RouteObject[] = [
       },
     ],
   },
-  
+
   // 404 page
   {
     path: '*',

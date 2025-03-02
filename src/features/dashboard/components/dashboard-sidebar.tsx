@@ -1,52 +1,157 @@
-import { Home, Settings, User, BarChart, CreditCard, HelpCircle } from "lucide-react";
+"use client"
+
+import * as React from "react"
+import {
+  Command,
+  Settings2,
+  DollarSign,
+  ChartPie,
+  Bell,
+  ShieldUser,
+  UserRound
+} from "lucide-react"
+
+import { NavMain } from "@/components/nav-main"
+import { NavSecondary } from "@/components/nav-secondary"
+import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
   SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
+  SidebarFooter,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
-import { useAuth } from "@/features/auth/hooks/use-auth";
-import { Link } from "react-router-dom";
+} from "@/components/ui/sidebar"
 
-export function DashboardSidebar() {
-  const { user } = useAuth();
-  
-  // Menu items
-  const dashboardItems = [
-    { title: "Dashboard", url: "/dashboard", icon: Home },
-    { title: "Profile", url: "/profile", icon: User },
-    { title: "Analytics", url: "/analytics", icon: BarChart },
-    { title: "Billing", url: "/billing", icon: CreditCard },
-    { title: "Settings", url: "/settings", icon: Settings },
-    { title: "Help", url: "/help", icon: HelpCircle },
-  ];
+const data = {
+  user: {
+    name: "shadcn",
+    email: "m@example.com",
+    avatar: "/avatars/shadcn.jpg",
+  },
+  navMain: [
+    {
+      title: "Dashboard",
+      url: "/dashboard",
+      icon: ChartPie,
+      // isActive: true,
+      // items: [
+      //   {
+      //     title: "History",
+      //     url: "#",
+      //   },
+      //   {
+      //     title: "Starred",
+      //     url: "#",
+      //   },
+      //   {
+      //     title: "Settings",
+      //     url: "#",
+      //   },
+      // ],
+    },
+    {
+      title: "Sale",
+      url: "#",
+      icon: DollarSign,
+      isActive: true,
+      items: [
+        {
+          title: "ส่วนกลาง",
+          url: "/sale-dashboard",
+        },
+        {
+          title: "ข้อมูลลูกค้าของฉัน",
+          url: "#",
+        },
+        {
+          title: "ข้อมูลพนักงานขาย",
+          url: "#",
+        },
+      ],
+    },
+    {
+      title: "Notification",
+      url: "#",
+      icon: Bell,
+      isActive: true,
+      items: [
+        {
+          title: "รอบการสั้งซื้อ",
+          url: "#",
+        },
+      ],
+    },
+    {
+      title: "Admin",
+      url: "#",
+      icon: ShieldUser,
+      isActive: true,
+      items: [
+        {
+          title: "อนุมัติเบิกสินค้า",
+          url: "#",
+        },
+        {
+          title: "สร้างใบเสนอราคา",
+          url: "#",
+        },
+      ],
+    },
+    {
+      title: "Central",
+      url: "#",
+      icon: UserRound,
+      // isActive: true,
+      // items: [
+      //   {
+      //     title: "อนุมัติเบิกสินค้า",
+      //     url: "#",
+      //   },
+      //   {
+      //     title: "สร้างใบเสนอราคา",
+      //     url: "#",
+      //   },
+      // ],
+    },
+  ],
+  navSecondary: [
+    {
+      title: "Settings",
+      url: "#",
+      icon: Settings2,
+    },
+  ],
+}
 
+export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar>
+    <Sidebar variant="inset" {...props}>
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" asChild>
+              <a href="#">
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                  <Command className="size-4" />
+                </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">JTAGCO</span>
+                  <span className="truncate text-xs">Enterprise</span>
+                </div>
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Dashboard</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {dashboardItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link to={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        <NavMain items={data.navMain} />
+        <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
+      <SidebarFooter>
+        <NavUser user={data.user} />
+      </SidebarFooter>
     </Sidebar>
-  );
+  )
 }

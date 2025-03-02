@@ -1,4 +1,3 @@
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Navbar } from "./navbar";
 import { Footer } from "./footer";
 import { Outlet } from "react-router-dom";

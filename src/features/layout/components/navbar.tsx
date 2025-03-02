@@ -2,47 +2,63 @@
 import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/features/auth/hooks/use-auth";
-import { Link } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
+
+import {
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
+import { SearchSelection } from "@/components/search-selection";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 
 export function Navbar() {
   const { isAuthenticated, logout } = useAuth();
 
   return (
-    <header className="bg-background border-b">
-      <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link to="/" className="font-bold text-lg">JTAGCO</Link>
-          <nav className="hidden md:flex gap-6">
-            <Link to="/about" className="text-sm font-medium transition-colors hover:text-primary">
-              About
+    <header className="flex h-16 shrink-0 justify-between items-center gap-2 border-b px-4">
+      <div className="flex flex-row justify-center items-center  ">
+        <SidebarTrigger className="-ml-1" />
+        <Separator orientation="vertical" className="mr-2 h-4" />
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem className="hidden md:block">
+              <BreadcrumbLink href="#">
+                Building Your Application
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator className="hidden md:block" />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Data Fetching</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
+      <div className="flex items-center gap-4">
+        <ModeToggle />
+        <SearchSelection />
+        {/* {isAuthenticated ? (
+          <>
+            <Button variant="outline" size="sm" onClick={logout}>
+              Log out
+            </Button>
+          </>
+        ) : (
+          <>
+            <Link to="/login">
+              <Button variant="outline" size="sm">Log in</Button>
             </Link>
-            <Link to="/contact" className="text-sm font-medium transition-colors hover:text-primary">
-              Contact
+            <Link to="/register">
+              <Button size="sm">Sign up</Button>
             </Link>
-          </nav>
-        </div>
-        <div className="flex items-center gap-4">
-          <ModeToggle />
-          {isAuthenticated ? (
-            <>
-              <Link to="/dashboard">
-                <Button variant="outline" size="sm">Dashboard</Button>
-              </Link>
-              <Button variant="ghost" size="sm" onClick={logout}>
-                Log out
-              </Button>
-            </>
-          ) : (
-            <>
-              <Link to="/login">
-                <Button variant="outline" size="sm">Log in</Button>
-              </Link>
-              <Link to="/register">
-                <Button size="sm">Sign up</Button>
-              </Link>
-            </>
-          )}
-        </div>
+          </>
+        )} */}
       </div>
     </header>
   );
