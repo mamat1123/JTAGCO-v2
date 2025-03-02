@@ -1,0 +1,50 @@
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+// import { Textarea } from "@/components/ui/textarea";
+
+export function ContactPage() {
+  return (
+    <div className="container py-12">
+      <h1 className="text-4xl font-bold mb-6">Contact Us</h1>
+      <div className="grid gap-8 md:grid-cols-2">
+        <div>
+          <p className="text-lg mb-6">
+            We'd love to hear from you. Fill out the form and we'll get back to you as soon as possible.
+          </p>
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-lg font-medium">Email</h3>
+              <p>contact@jtagco.com</p>
+            </div>
+            <div>
+              <h3 className="text-lg font-medium">Phone</h3>
+              <p>+1 (555) 123-4567</p>
+            </div>
+            <div>
+              <h3 className="text-lg font-medium">Address</h3>
+              <p>123 Tech Street, Suite 456<br />San Francisco, CA 94105</p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <form className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="name">Name</Label>
+              <Input id="name" placeholder="Your name" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" type="email" placeholder="Your email" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="message">Message</Label>
+              {/* <Textarea id="message" placeholder="How can we help?" className="min-h-32" /> */}
+            </div>
+            <Button type="submit">Send Message</Button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}

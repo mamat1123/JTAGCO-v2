@@ -1,27 +1,28 @@
-import { createBrowserRouter, Navigate, RouteObject } from 'react-router-dom'
-import App from './app'
-import { LoginPage } from './routes/login'
-import { HomePage } from './routes/home'
-import { AboutPage } from './routes/about'
-import { ContactPage } from './routes/contact'
-import { RegisterPage } from './routes/register'
-import { NotFoundPage } from './routes/not-found'
-import { ROUTES } from '@/config/constants'
-import { AuthLayout } from '@/components/layout/auth-layout'
-import { MainLayout } from '@/components/layout/main-layout'
-import { DashboardLayout } from '@/components/layout/dashboard-layout'
-import { ReactNode } from 'react'
+// src/app/router.tsx
+import { createBrowserRouter, Navigate, RouteObject } from 'react-router-dom';
+import { LoginPage } from './routes/login';
+import { HomePage } from './routes/home';
+import { AboutPage } from './routes/about';
+import { ContactPage } from './routes/contact';
+import { RegisterPage } from './routes/register';
+import { NotFoundPage } from './routes/not-found';
+import { ROUTES } from '@/config/constants';
+import { AuthLayout } from '@/features/layout/components/auth-layout';
+import { MainLayout } from '@/features/layout/components/main-layout';
+import { DashboardLayout } from '@/features/layout/components/dashboard-layout';
+import { useAuth } from '@/features/auth/hooks/use-auth';
+import { ReactNode } from 'react';
 
 // Protected route component
 function ProtectedRoute({ children }: { children: ReactNode }) {
-  const auth = localStorage.getItem('auth_token')
-  return auth ? <>{children}</> : <Navigate to="/login" />
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
 }
 
 // Auth route component (redirects to home if already logged in)
 function AuthRoute({ children }: { children: ReactNode }) {
-  const auth = localStorage.getItem('auth_token')
-  return auth ? <Navigate to="/dashboard" /> : <>{children}</>
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? <Navigate to="/dashboard" /> : <>{children}</>;
 }
 
 // Define routes
@@ -107,6 +108,6 @@ const routes: RouteObject[] = [
     path: '*',
     element: <NotFoundPage />,
   },
-]
+];
 
-export const router = createBrowserRouter(routes)
+export const router = createBrowserRouter(routes);

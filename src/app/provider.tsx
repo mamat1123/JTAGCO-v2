@@ -1,8 +1,9 @@
-import { StrictMode } from 'react'
-import { RouterProvider } from 'react-router-dom'
-import { router } from './router'
-import { ThemeProvider } from '@/components/theme-provider'
-import { AuthProvider } from '@/features/auth/hooks/use-auth'
+// src/app/provider.tsx
+import { StrictMode } from 'react';
+import { RouterProvider } from 'react-router-dom';
+import { router } from './router';
+import { ThemeProvider } from '@/components/theme-provider'; 
+import { AuthProvider } from '@/features/auth/hooks/use-auth';
 
 export function AppProvider() {
   return (
@@ -13,5 +14,5 @@ export function AppProvider() {
         </AuthProvider>
       </ThemeProvider>
     </StrictMode>
-  )
+  );
 }
