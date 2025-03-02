@@ -1,6 +1,8 @@
 "use client"
 
 import * as React from "react"
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import {
   Command,
   Settings2,
@@ -14,6 +16,7 @@ import {
 import { NavMain } from "@/components/nav-main"
 import { NavSecondary } from "@/components/nav-secondary"
 import { NavUser } from "@/components/nav-user"
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import {
   Sidebar,
   SidebarContent,
@@ -126,6 +129,7 @@ const data = {
 }
 
 export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { isAuthenticated, logout } = useAuth();
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
@@ -151,6 +155,24 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
+      </SidebarFooter>
+      <SidebarFooter>
+        {isAuthenticated ? (
+          <>
+            <Button className="text-black cursor-pointer" variant="outline" size="sm" onClick={logout}>
+              Log out
+            </Button>
+          </>
+        ) : (
+          <>
+            <Link to="/">
+              <Button variant="outline" size="sm">Log in</Button>
+            </Link>
+            <Link to="/register">
+              <Button size="sm">Sign up</Button>
+            </Link>
+          </>
+        )}
       </SidebarFooter>
     </Sidebar>
   )

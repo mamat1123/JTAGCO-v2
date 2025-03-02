@@ -1,7 +1,7 @@
 // src/config/constants.ts
 export const ROUTES = {
   HOME: '/',
-  LOGIN: '/login',
+  LOGIN: '/',
   REGISTER: '/register',
   DASHBOARD: '/dashboard',
   PROFILE: '/profile',

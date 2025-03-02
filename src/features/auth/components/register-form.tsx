@@ -32,7 +32,7 @@ export function RegisterForm() {
   };
 
   return (
-    <Card className="w-[350px]">
+    <Card>
       <CardHeader>
         <CardTitle className="text-2xl">Create an account</CardTitle>
       </CardHeader>
@@ -82,7 +82,7 @@ export function RegisterForm() {
       <CardFooter className="flex justify-center">
         <p className="text-sm text-muted-foreground">
           Already have an account?{' '}
-          <a href="/login" className="text-primary hover:underline">
+          <a href="/" className="text-primary hover:underline">
             Log in
           </a>
         </p>

@@ -17,7 +17,7 @@ import { ReactNode } from 'react';
 // Protected route component
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const { isAuthenticated } = useAuth();
-  return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
+  return isAuthenticated ? <>{children}</> : <Navigate to="/" />;
 }
 
 // Auth route component (redirects to home if already logged in)
@@ -84,22 +84,6 @@ const routes: RouteObject[] = [
       {
         path: '/help',
         element: <div>Help & Support</div>,
-      },
-    ],
-  },
-
-  // Main layout routes (with navbar and footer but no sidebar)
-  {
-    path: '/',
-    element: <MainLayout />,
-    children: [
-      {
-        path: ROUTES.ABOUT,
-        element: <AboutPage />,
-      },
-      {
-        path: ROUTES.CONTACT,
-        element: <ContactPage />,
       },
     ],
   },
