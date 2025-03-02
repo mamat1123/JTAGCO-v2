@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-// import { Textarea } from "@/components/ui/textarea";
 
 export function ContactPage() {
   return (
@@ -39,7 +38,6 @@ export function ContactPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="message">Message</Label>
-              {/* <Textarea id="message" placeholder="How can we help?" className="min-h-32" /> */}
             </div>
             <Button type="submit">Send Message</Button>
           </form>

@@ -2,7 +2,7 @@
 import { StrictMode } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { router } from './router';
-import { ThemeProvider } from '@/components/theme-provider'; 
+import { ThemeProvider } from '@/components/theme-provider';
 import { AuthProvider } from '@/features/auth/hooks/use-auth';
 
 export function AppProvider() {

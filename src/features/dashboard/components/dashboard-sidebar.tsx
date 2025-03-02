@@ -8,8 +8,10 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/features/auth/hooks/use-auth";
+import { Link } from "react-router-dom";
 
 export function DashboardSidebar() {
   const { user } = useAuth();
@@ -34,10 +36,10 @@ export function DashboardSidebar() {
               {dashboardItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url}>
+                    <Link to={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
