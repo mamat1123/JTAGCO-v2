@@ -9,6 +9,8 @@ import { CompanyDetails } from "@/features/Sales/components/CompanyDetails";
 import { CompaniesList } from "@/features/Sales/components/CompaniesList";
 import { EditCompany } from '@/features/Sales/components/EditCompany';
 import { CreateCompanyPage } from "@/features/Sales/pages/CreateCompanyPage";
+import ProductsPage from '@/features/Settings/Products/ProductsPage';
+import SettingsPage from '@/features/Settings/SettingsPage';
 
 export const router = createBrowserRouter([
   {
@@ -41,7 +43,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/companies",
-        element:  <Navigate to="/sales?tab=customers" replace />,
+        element: <Navigate to="/sales?tab=customers" replace />,
       },
       {
         path: "/companies/create",
@@ -60,13 +62,27 @@ export const router = createBrowserRouter([
         element: <div>Billing Information</div>,
       },
       {
-        path: '/settings',
-        element: <div>Account Settings</div>,
-      },
-      {
         path: '/help',
         element: <div>Help & Support</div>,
       },
     ],
   },
+  {
+    path: '/settings',
+    element: (
+      <ProtectedRoute>
+        <DashboardLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        index: true,
+        element: <SettingsPage />,
+      },
+      {
+        path: 'products',
+        element: <ProductsPage />,
+      },
+    ],
+  }
 ]);

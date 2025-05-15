@@ -80,7 +80,7 @@ export function DashboardNavbar() {
       <div className="flex flex-row justify-center items-center">
         <SidebarTrigger className="-ml-1" />
         <Separator orientation="vertical" className="mr-2 h-4" />
-        <Breadcrumb>
+        <Breadcrumb className="hidden md:block">
           <BreadcrumbList>
             {breadcrumbItems}
           </BreadcrumbList>
