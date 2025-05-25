@@ -15,9 +15,11 @@ api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${session.access_token}`;
   }
   return config;
+}, (error) => {
+  return Promise.reject(error);
 });
 
-// Add response interceptor to handle 401 errors
+// Add response interceptor to handle errors
 api.interceptors.response.use(
   (response) => response,
   (error) => {

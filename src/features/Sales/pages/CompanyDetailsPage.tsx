@@ -82,8 +82,8 @@ export function CompanyDetails() {
                 <p className="text-sm sm:text-base font-medium">{currentCompany.branch || '-'}</p>
               </div>
               <div>
-                <p className="text-xs sm:text-sm text-gray-500">ตำแหน่ง</p>
-                <p className="text-sm sm:text-base font-medium">{currentCompany.position || '-'}</p>
+                <p className="text-xs sm:text-sm text-gray-500">อีเมล</p>
+                <p className="text-sm sm:text-base font-medium">{currentCompany.email || '-'}</p>
               </div>
             </div>
           </CardContent>
@@ -115,10 +115,6 @@ export function CompanyDetails() {
               <div>
                 <p className="text-xs sm:text-sm text-gray-500">รหัสไปรษณีย์</p>
                 <p className="text-sm sm:text-base font-medium">{currentCompany.zip_code || '-'}</p>
-              </div>
-              <div>
-                <p className="text-xs sm:text-sm text-gray-500">อีเมล</p>
-                <p className="text-sm sm:text-base font-medium">{currentCompany.email || '-'}</p>
               </div>
             </div>
           </CardContent>

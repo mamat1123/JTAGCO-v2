@@ -5,12 +5,13 @@ import { ProtectedRoute } from '@/features/Auth/ProtectedRoute';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import DashboardPage from '@/features/Dashboard/DashboardPage';
 import { SaleDashboardPage } from '@/features/Sales/SalesPage';
-import { CompanyDetails } from "@/features/Sales/components/CompanyDetails";
+import { CompanyDetails } from "@/features/Sales/pages/CompanyDetailsPage";
 import { CompaniesList } from "@/features/Sales/components/CompaniesList";
-import { EditCompany } from '@/features/Sales/components/EditCompany';
+import { EditCompany } from '@/features/Sales/pages/EditCompanyPage';
 import { CreateCompanyPage } from "@/features/Sales/pages/CreateCompanyPage";
 import ProductsPage from '@/features/Settings/Products/ProductsPage';
 import SettingsPage from '@/features/Settings/SettingsPage';
+import EventsPage from '@/features/Events/EventsPage';
 
 export const router = createBrowserRouter([
   {
@@ -64,6 +65,10 @@ export const router = createBrowserRouter([
       {
         path: '/help',
         element: <div>Help & Support</div>,
+      },
+      {
+        path: '/events',
+        element: <EventsPage />,
       },
     ],
   },

@@ -11,7 +11,7 @@ export class CompaniesService {
     return companyAPI.getCompany(id);
   }
 
-  static async createCompany(company: CreateCompanyDTO): Promise<Company> {
+  static async createCompany(company: CreateCompanyDTO): Promise<Company> {    
     return companyAPI.createCompany(company);
   }
 

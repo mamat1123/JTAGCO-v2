@@ -6,10 +6,10 @@ import { BarChart, LineChart, Activity, Users, DollarSign, ShoppingCart } from "
 import { useSearchParams, useNavigate } from "react-router-dom";
 
 // Import the Calendar component
-import { Calendar } from "@/features/Sales/components/CalendarEvent";
-import { CalendarService } from "@/features/Sales/services/CalendarService";
+import { Calendar } from "@/features/Events/components/CalendarEvent";
 import { CalendarEvent } from "@/entities/Calendar/calendar";
 import { CompaniesList } from "@/features/Sales/components/CompaniesList";
+import { EventsList } from "@/features/Events/components/EventsList";
 
 export function SaleDashboardPage() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -18,21 +18,6 @@ export function SaleDashboardPage() {
   const navigate = useNavigate();
 
   const activeTab = searchParams.get('tab') || 'calendar';
-
-  useEffect(() => {
-    const loadEvents = async () => {
-      try {
-        const calendarEvents = await CalendarService.fetchEvents();
-        setEvents(calendarEvents);
-      } catch (error) {
-        console.error("Failed to fetch calendar events:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadEvents();
-  }, []);
 
   const handleTabChange = (value: string) => {
     setSearchParams({ tab: value });
@@ -101,7 +86,7 @@ export function SaleDashboardPage() {
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsList>
           <TabsTrigger value="calendar">ปฏิทิน</TabsTrigger>
-          {/* <TabsTrigger value="analytics">วิเคราะห์</TabsTrigger> */}
+          <TabsTrigger value="list">รายการกิจกรรม</TabsTrigger>
           <TabsTrigger value="customers">ลูกค้า</TabsTrigger>
         </TabsList>
 
@@ -111,28 +96,18 @@ export function SaleDashboardPage() {
               <CardTitle>ปฏิทินกิจกรรมการขาย</CardTitle>
             </CardHeader>
             <CardContent>
-              {loading ? (
-                <div className="flex justify-center items-center h-96">
-                  <p className="text-muted-foreground">กำลังโหลดข้อมูลปฏิทิน...</p>
-                </div>
-              ) : (
-                <Calendar events={events} />
-              )}
+              <Calendar />
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="analytics" className="p-0 pt-4">
+        <TabsContent value="list" className="p-0 pt-4">
           <Card>
             <CardHeader>
-              <CardTitle>วิเคราะห์การขาย</CardTitle>
+              <CardTitle>รายการกิจกรรมการขาย</CardTitle>
             </CardHeader>
-            <CardContent className="flex justify-center py-10">
-              <div className="flex flex-col items-center space-y-2">
-                <LineChart className="h-16 w-16 text-muted-foreground" />
-                <p className="text-muted-foreground">ข้อมูลการวิเคราะห์จะแสดงที่นี่</p>
-                <Button variant="outline" className="mt-4">สร้างรายงาน</Button>
-              </div>
+            <CardContent>
+              <EventsList />
             </CardContent>
           </Card>
         </TabsContent>

@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
 } from '@/shared/components/ui/dialog';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
@@ -23,6 +24,12 @@ import {
   RadioGroup,
   RadioGroupItem,
 } from "@/shared/components/ui/radio-group"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/shared/components/ui/tooltip"
 
 // Import components
 import { SizeRangeInput } from './ProductVariant/SizeRangeInput';
@@ -38,10 +45,9 @@ interface ProductVariantFormDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: CreateProductVariantDTO) => void;
-  editingVariant: ProductVariant | null;
   productId: string;
-  initialData?: Partial<CreateProductVariantDTO>;
   isLoading?: boolean;
+  productName: string;
 }
 
 interface ColorWithImage {
@@ -54,22 +60,18 @@ export function ProductVariantFormDialog({
   isOpen,
   onOpenChange,
   onSubmit,
-  editingVariant,
   productId,
-  initialData,
   isLoading = false,
+  productName,
 }: ProductVariantFormDialogProps) {
-  const [formData, setFormData] = useState<Partial<CreateProductVariantDTO>>(
-    initialData || {
-      product_id: productId,
-      sku: '',
-      attributes: {
-      },
-      is_made_to_order: false,
-      price: 0,
-      stock: 0,
-    }
-  );
+  const [formData, setFormData] = useState<Partial<CreateProductVariantDTO>>({
+    product_id: productId,
+    sku: '',
+    attributes: {},
+    is_made_to_order: false,
+    price: 0,
+    stock: 0,
+  });
 
   const [selectedAttributeType, setSelectedAttributeType] = useState<string>("");
   const [attributeValue, setAttributeValue] = useState<string>("");
@@ -79,28 +81,76 @@ export function ProductVariantFormDialog({
   const [selectedColors, setSelectedColors] = useState<ColorWithImage[]>([]);
   const [customColor, setCustomColor] = useState("");
   const [steelPlateValue, setSteelPlateValue] = useState<string>("");
-  const [selectedInsoles, setSelectedInsoles] = useState<string[]>([]);
-  const [insoleProducts, setInsoleProducts] = useState<Product[]>([]);
+  const [showUnsavedModal, setShowUnsavedModal] = useState(false);
+  const [hasUnsavedAttributes, setHasUnsavedAttributes] = useState(false);
 
-  // Fetch insole products
   useEffect(() => {
-    const fetchInsoleProducts = async () => {
-      try {
-        const products = await productAPI.getProducts();
-        const insoles = products.filter(product => product.type === ProductType.INSOLE);
-        setInsoleProducts(insoles);
-      } catch (error) {
-        console.error('Failed to fetch insole products:', error);
-      }
-    };
+    console.log(formData);
+  }, [formData]);
 
-    if (selectedAttributeType === 'insole') {
-      fetchInsoleProducts();
-    }
-  }, [selectedAttributeType]);
+  // Reset form function
+  const resetForm = () => {
+    setFormData({
+      product_id: productId,
+      sku: '',
+      attributes: {},
+      is_made_to_order: false,
+      price: 0,
+      stock: 0,
+    });
+    setSelectedAttributeType("");
+    setAttributeValue("");
+    setCustomAttributeKey("");
+    setIsCustomAttribute(false);
+    setSizeRange({ min: 0, max: 0 });
+    setSelectedColors([]);
+    setCustomColor("");
+    setSteelPlateValue("");
+  };
+
+  // Handle modal close
+  const handleOpenChange = (open: boolean) => {
+    onOpenChange(open);
+  };
+
+  // Add this function to check for unsaved attributes
+  const checkUnsavedAttributes = () => {
+    return (
+      selectedAttributeType !== "" &&
+      ((selectedAttributeType === "size" && (sizeRange.min !== 0 || sizeRange.max !== 0)) ||
+        (selectedAttributeType === "color" && selectedColors.length > 0) ||
+        (selectedAttributeType === "image" && formData.attributes?.image) ||
+        (selectedAttributeType === "steel_plate" && steelPlateValue !== "") ||
+        (isCustomAttribute && (customAttributeKey !== "" || attributeValue !== "")) ||
+        (!isCustomAttribute && attributeValue !== ""))
+    );
+  };
+
+  // Update hasUnsavedAttributes whenever relevant states change
+  useEffect(() => {
+    setHasUnsavedAttributes(checkUnsavedAttributes());
+  }, [
+    selectedAttributeType,
+    sizeRange,
+    selectedColors,
+    formData.attributes?.image,
+    steelPlateValue,
+    customAttributeKey,
+    attributeValue,
+    isCustomAttribute
+  ]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (hasUnsavedAttributes) {
+      setShowUnsavedModal(true);
+      return;
+    }
+    onSubmit(formData as CreateProductVariantDTO);
+  };
+
+  const handleConfirmSubmit = () => {
+    setShowUnsavedModal(false);
     onSubmit(formData as CreateProductVariantDTO);
   };
 
@@ -113,7 +163,6 @@ export function ProductVariantFormDialog({
     setSelectedColors([]);
     setCustomColor("");
     setSteelPlateValue("");
-    setSelectedInsoles([]);
   };
 
   const handleSizeRangeChange = (type: 'min' | 'max', value: string) => {
@@ -190,14 +239,6 @@ export function ProductVariantFormDialog({
     }));
   };
 
-  const handleInsoleSelect = (insoleId: string) => {
-    setSelectedInsoles(prev =>
-      prev.includes(insoleId)
-        ? prev.filter(id => id !== insoleId)
-        : [...prev, insoleId]
-    );
-  };
-
   const handleAddAttribute = () => {
     if (!selectedAttributeType) return;
 
@@ -216,16 +257,6 @@ export function ProductVariantFormDialog({
     } else if (selectedAttributeType === "steel_plate") {
       if (!steelPlateValue) return;
       newAttributes.steel_plate = steelPlateValue;
-    } else if (selectedAttributeType === "insole") {
-      if (selectedInsoles.length === 0) return;
-
-      const selectedInsoleNames = selectedInsoles
-        .map(id => insoleProducts.find(p => p.id === id)?.name)
-        .filter(Boolean)
-        .join(', ');
-
-      newAttributes.has_insole = true;
-      newAttributes.insoles = selectedInsoleNames;
     } else if (isCustomAttribute) {
       if (!customAttributeKey || !attributeValue) return;
       newAttributes[customAttributeKey] = attributeValue;
@@ -274,7 +305,7 @@ export function ProductVariantFormDialog({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button className="bg-primary hover:bg-primary/90">
           <Plus className="w-4 h-4 mr-2" />
@@ -283,7 +314,7 @@ export function ProductVariantFormDialog({
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px] w-[95vw] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold">เพิ่มตัวแปรสินค้าใหม่</DialogTitle>
+          <DialogTitle className="text-xl font-semibold">เพิ่มตัวแปรสินค้าใหม่ ({productName})</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* ตัวเลือกสินค้า */}
@@ -307,7 +338,6 @@ export function ProductVariantFormDialog({
                       <SelectItem value="size">ขนาด</SelectItem>
                       <SelectItem value="color">สี</SelectItem>
                       <SelectItem value="steel_plate">รองรับการเสริมแผ่นเหล็ก</SelectItem>
-                      {/* <SelectItem value="insole">รองรับการเสริมแผ่นรองในรองเท้า</SelectItem> */}
                       <SelectItem value="other">อื่นๆ</SelectItem>
                     </SelectContent>
                   </Select>
@@ -351,14 +381,6 @@ export function ProductVariantFormDialog({
                     />
                   )}
 
-                  {selectedAttributeType === "insole" && (
-                    <InsoleSelector
-                      selectedInsoles={selectedInsoles}
-                      insoleProducts={insoleProducts}
-                      onInsoleSelect={handleInsoleSelect}
-                    />
-                  )}
-
                   {isCustomAttribute && (
                     <div className="space-y-3">
                       <Input
@@ -378,7 +400,7 @@ export function ProductVariantFormDialog({
                     </div>
                   )}
 
-                  {!isCustomAttribute && selectedAttributeType && !["size", "color", "image", "steel_plate", "insole"].includes(selectedAttributeType) && (
+                  {!isCustomAttribute && selectedAttributeType && !["size", "color", "image", "steel_plate"].includes(selectedAttributeType) && (
                     <Input
                       type="text"
                       placeholder="ระบุค่า"
@@ -389,24 +411,32 @@ export function ProductVariantFormDialog({
                   )}
                 </div>
                 <div className='flex justify-end'>
-                  <Button
-                    type="button"
-                    size="icon"
-                    onClick={handleAddAttribute}
-                    disabled={
-                      !selectedAttributeType ||
-                      (selectedAttributeType === "size" ? (sizeRange.min === 0 || sizeRange.max === 0 || sizeRange.min > sizeRange.max) :
-                        selectedAttributeType === "color" ? selectedColors.length === 0 :
-                          selectedAttributeType === "image" ? !formData.attributes?.image :
-                            selectedAttributeType === "steel_plate" ? !steelPlateValue :
-                              selectedAttributeType === "insole" ? selectedInsoles.length === 0 :
-                                isCustomAttribute ? (!customAttributeKey || !attributeValue) :
-                                  !attributeValue)
-                    }
-                    className="bg-primary hover:bg-primary/90 h-10 w-10"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </Button>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          onClick={handleAddAttribute}
+                          disabled={
+                            !selectedAttributeType ||
+                            (selectedAttributeType === "size" ? (sizeRange.min === 0 || sizeRange.max === 0 || sizeRange.min > sizeRange.max) :
+                              selectedAttributeType === "color" ? selectedColors.length === 0 :
+                                selectedAttributeType === "image" ? !formData.attributes?.image :
+                                  selectedAttributeType === "steel_plate" ? !steelPlateValue :
+                                    isCustomAttribute ? (!customAttributeKey || !attributeValue) :
+                                      !attributeValue)
+                          }
+                          className="w-full bg-primary hover:bg-primary/90 h-12 px-6 gap-2 text-white font-medium text-base shadow-lg hover:shadow-xl transition-all duration-200"
+                        >
+                          <Plus className="w-5 h-5" />
+                          บันทึกตัวเลือกสินค้า
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>คลิกเพื่อบันทึกตัวเลือกสินค้าที่เลือกไว้</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               </div>
             </div>
@@ -447,10 +477,39 @@ export function ProductVariantFormDialog({
             className="w-full bg-primary hover:bg-primary/90 h-10"
             disabled={isLoading}
           >
-            {isLoading ? 'กำลังดำเนินการ...' : editingVariant ? 'อัปเดต' : 'เพิ่ม'} ตัวแปรสินค้า
+            {isLoading ? 'กำลังดำเนินการ...' : 'เพิ่ม'} ตัวแปรสินค้า
           </Button>
         </form>
       </DialogContent>
+
+      {/* Add this new Dialog for unsaved attributes */}
+      <Dialog open={showUnsavedModal} onOpenChange={setShowUnsavedModal}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold">มีตัวเลือกที่ยังไม่ได้บันทึก</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-muted-foreground">
+              คุณมีตัวเลือกที่เลือกไว้แต่ยังไม่ได้บันทึก คุณต้องการดำเนินการต่อหรือไม่?
+            </p>
+          </div>
+          <DialogFooter className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowUnsavedModal(false)}
+              className="w-full sm:w-auto"
+            >
+              ยกเลิก
+            </Button>
+            <Button
+              onClick={handleConfirmSubmit}
+              className="w-full sm:w-auto bg-primary hover:bg-primary/90"
+            >
+              ดำเนินการต่อ
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }

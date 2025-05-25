@@ -12,6 +12,7 @@ import { Company } from "@/entities/Company/company";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/shared/components/ui/button";
 import { Plus } from "lucide-react";
+import { CompanyFilter, CompanyFilters } from "./CompanyFilter";
 
 export function CompaniesList() {
   const navigate = useNavigate();
@@ -20,6 +21,11 @@ export function CompaniesList() {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [filters, setFilters] = useState<CompanyFilters>({
+    search: '',
+    province: 'all',
+    user_id: 'all'
+  });
   const observer = useRef<IntersectionObserver | null>(null);
   const itemsPerPage = 10;
 
@@ -34,13 +40,21 @@ export function CompaniesList() {
     if (node) observer.current.observe(node);
   }, [loading, hasMore]);
 
+  const handleFilterChange = (newFilters: CompanyFilters) => {
+    setFilters(newFilters);
+    setPage(1); // Reset page when filters change
+  };
+
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
         setLoading(true);
         const response = await CompaniesService.fetchCompanies({
           page,
-          limit: itemsPerPage
+          limit: itemsPerPage,
+          search: filters.search,
+          province: filters.province === 'all' ? undefined : filters.province,
+          user_id: filters.user_id === 'all' ? undefined : filters.user_id
         });
         
         if (page === 1) {
@@ -63,7 +77,7 @@ export function CompaniesList() {
     };
 
     fetchCompanies();
-  }, [page]);
+  }, [page, filters]);
 
   const handleRowClick = (companyId: string) => {
     navigate(`/companies/${companyId}`);
@@ -75,17 +89,19 @@ export function CompaniesList() {
 
   return (
     <div className="space-y-4 w-full">
-      <div className="flex justify-end">
+      <div className="flex flex-col md:flex-row justify-between gap-4">
+        <CompanyFilter onFilterChange={handleFilterChange} />
         <Button
           variant="default"
           size="sm"
           onClick={() => navigate('/companies/create')}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 whitespace-nowrap"
         >
           <Plus className="h-4 w-4" />
           <span>สร้างบริษัท</span>
         </Button>
       </div>
+
       <div className="overflow-x-auto rounded-md border">
         <div className="min-w-[800px] md:min-w-full">
           <Table>

@@ -33,10 +33,11 @@ export interface Company {
 export interface CreateCompanyDTO {
   name: string;
   email?: string;
-  phone?: string;
-  address?: string;
-  province?: string;
   credit: number;
+  tax_id: string;
+  branch: string;
+  business_type_id?: string;
+  user_id?: string;
 }
 
 export interface CompanyResponse {
@@ -48,4 +49,8 @@ export interface CompanyFilters {
   search?: string;
   page?: number;
   limit?: number;
+  name?: string;
+  province?: string;
+  email?: string;
+  user_id?: string;
 } 

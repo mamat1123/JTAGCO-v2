@@ -5,4 +5,8 @@ export interface CalendarEvent {
   startTime?: string;
   endTime?: string;
   type?: "default" | "success" | "warning" | "error" | "info";
+  userFullName?: string;
+  subTypeName?: string;
+  companyName?: string;
+  sub_type_id?: number;
 } 

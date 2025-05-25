@@ -13,6 +13,8 @@ import { ProductVariant, CreateProductVariantDTO } from '@/entities/Product/prod
 import { ProductVariantFormDialog } from './ProductVariantFormDialog';
 import { toast, Toaster } from 'sonner';
 import { productAPI } from '@/entities/Product/productAPI';
+import { ProductVariantFormSingleDialog } from "./ProductVariantFormSingleDialog";
+import type { ProductVariantFormData } from "@/shared/types/product";
 
 interface ColorWithImage {
   color: string;
@@ -25,12 +27,15 @@ interface ProductVariantsProps {
   onAdd: (data: ProductVariant[]) => void;
   onUpdate: (id: string, data: Partial<CreateProductVariantDTO>) => void;
   onDelete: (id: string) => void;
+  productName: string;
 }
 
-export function ProductVariants({ productId, variants, onAdd, onUpdate, onDelete }: ProductVariantsProps) {
+export function ProductVariants({ productId, variants, onAdd, onUpdate, onDelete, productName }: ProductVariantsProps) {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingVariant, setEditingVariant] = useState<ProductVariant | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>();
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const handleSubmit = async (formData: any) => {
     try {
@@ -50,28 +55,6 @@ export function ProductVariants({ productId, variants, onAdd, onUpdate, onDelete
           description: "อัพเดทตัวแปรสินค้าเรียบร้อยแล้ว",
         });
       } else {
-        // Create multiple variants based on size range and colors
-        const variantsToCreate: CreateProductVariantDTO[] = [];
-        const sizeRange = formData.attributes.size?.split(' - ').map(Number);
-        const colors = formData.attributes.colors || [];
-        // if (sizeRange && colors.length > 0) {
-        //   for (let size = sizeRange[0]; size <= sizeRange[1]; size++) {
-        //     for (const color of colors) {
-        //       variantsToCreate.push({
-        //         ...variantData,
-        //         attributes: {
-        //           ...variantData.attributes,
-        //           size: size.toString(),
-        //           colors: [color]
-        //         }
-        //       });
-        //     }
-        //   }
-        // } else {
-        //   variantsToCreate.push(variantData);
-        // }
-
-        console.log(formData);
         const createdVariants = await productAPI.createMultipleProductVariants(formData);
         onAdd(createdVariants);
         setIsAddDialogOpen(false);
@@ -89,8 +72,25 @@ export function ProductVariants({ productId, variants, onAdd, onUpdate, onDelete
   };
 
   const handleEdit = (variant: ProductVariant) => {
-    setEditingVariant(variant);
-    setIsAddDialogOpen(true);
+    setSelectedVariant(variant);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleEditSubmit = async (data: CreateProductVariantDTO) => {
+    if (!selectedVariant) return;
+    
+    try {
+      // TODO: Implement your API call here
+      // await updateProductVariant(selectedVariant.id, data);
+      
+      // Refresh the variants list
+      // await fetchVariants();
+      
+      setIsEditDialogOpen(false);
+      setSelectedVariant(undefined);
+    } catch (error) {
+      console.error("Failed to update variant:", error);
+    }
   };
 
   const handleDelete = (id: string) => {
@@ -109,21 +109,8 @@ export function ProductVariants({ productId, variants, onAdd, onUpdate, onDelete
           isOpen={isAddDialogOpen}
           onOpenChange={setIsAddDialogOpen}
           onSubmit={handleSubmit}
-          editingVariant={editingVariant}
           productId={productId}
-          initialData={editingVariant ? {
-            product_id: productId,
-            attributes: {
-              size: editingVariant.attributes.size,
-              colors: editingVariant.attributes.colors || [],
-              has_insole: editingVariant.attributes.has_insole,
-              has_toe_cap: editingVariant.attributes.has_toe_cap,
-              image: editingVariant.attributes.image
-            },
-            price: editingVariant.price,
-            stock: editingVariant.stock,
-            is_made_to_order: false
-          } : undefined}
+          productName={productName}
           isLoading={isLoading}
         />
       </div>
@@ -144,7 +131,6 @@ export function ProductVariants({ productId, variants, onAdd, onUpdate, onDelete
           </TableHeader>
           <TableBody>
             {variants.map((variant) => (
-              console.log(variant),
               <TableRow key={variant.id}>
                 <TableCell>
                   {variant.attributes.image ? (
@@ -193,6 +179,13 @@ export function ProductVariants({ productId, variants, onAdd, onUpdate, onDelete
           </TableBody>
         </Table>
       </div>
+
+      <ProductVariantFormSingleDialog
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        variant={selectedVariant}
+        onSubmit={handleEditSubmit}
+      />
     </div>
   );
 } 

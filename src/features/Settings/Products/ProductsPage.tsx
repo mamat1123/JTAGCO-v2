@@ -212,6 +212,7 @@ export default function ProductsPage() {
             </div>
             <ProductVariants
               productId={selectedProduct.id}
+              productName={selectedProduct.name}
               variants={variants}
               onAdd={handleAddVariant}
               onUpdate={handleUpdateVariant}
