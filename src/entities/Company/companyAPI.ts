@@ -1,4 +1,4 @@
-import { Company, CompanyFilters, CompanyResponse, CreateCompanyDTO } from './company';
+import { Company, CompanyFilters, CompanyResponse, CreateCompanyDTO, UpdateCompanyDTO } from './company';
 import { api } from '@/shared/config/api';
 
 export const companyAPI = {
@@ -17,7 +17,7 @@ export const companyAPI = {
     return response.data;
   },
 
-  async updateCompany(id: string, company: Partial<Company>): Promise<Company> {
+  async updateCompany(id: string, company: Partial<UpdateCompanyDTO>): Promise<Company> {
     const { data } = await api.put<Company>(`/companies/${id}`, company);
     return data;
   },

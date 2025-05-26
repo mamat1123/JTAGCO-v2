@@ -12,25 +12,29 @@ import { BusinessTypeDto } from "@/entities/BusinessType/businessType";
 interface BasicInfoFormProps {
   name: string;
   tax_id: string;
-  business_type_id?: string;
+  business_type_id?: number;
+  business_type_detail?: string;
   branch: string;
   email?: string;
   credit: number;
   businessTypes: BusinessTypeDto[];
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBusinessTypeChange: (value: string) => void;
+  onBusinessTypeDetailChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export function BasicInfoForm({
   name,
   tax_id,
   business_type_id,
+  business_type_detail,
   branch,
   email,
   credit,
   businessTypes,
   onChange,
   onBusinessTypeChange,
+  onBusinessTypeDetailChange,
 }: BasicInfoFormProps) {
   return (
     <div className="space-y-4">
@@ -62,7 +66,7 @@ export function BasicInfoForm({
         <div className="space-y-2">
           <Label htmlFor="business_type_id">ประเภทธุรกิจ</Label>
           <Select
-            value={business_type_id}
+            value={business_type_id?.toString() || ''}
             onValueChange={onBusinessTypeChange}
           >
             <SelectTrigger className="w-full">
@@ -77,6 +81,20 @@ export function BasicInfoForm({
             </SelectContent>
           </Select>
         </div>
+
+        {business_type_id === 99 && (
+          <div className="space-y-2">
+            <Label htmlFor="business_type_detail">รายละเอียดประเภทธุรกิจ</Label>
+            <Input
+              id="business_type_detail"
+              name="business_type_detail"
+              value={business_type_detail}
+              onChange={onBusinessTypeDetailChange}
+              required
+              placeholder="กรอกรายละเอียดประเภทธุรกิจ"
+            />
+          </div>
+        )}
 
         <div className="space-y-2">
           <Label htmlFor="branch">สาขา</Label>

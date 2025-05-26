@@ -7,6 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
+import { Textarea } from "@/shared/components/ui/textarea";
 import { PROVINCES } from "@/shared/constants/provinces";
 
 interface AddressFormProps {
@@ -15,7 +16,7 @@ interface AddressFormProps {
   zipCode: string;
   latitude?: number;
   longitude?: number;
-  onAddressChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onAddressChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   onProvinceChange: (value: string) => void;
   onZipCodeChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onPositionChange?: (lat: number, lng: number) => void;
@@ -38,7 +39,7 @@ export function AddressForm({
       <div className="grid grid-cols-1 gap-4">
         <div className="space-y-2">
           <Label htmlFor="address">ที่อยู่</Label>
-          <Input
+          <Textarea
             id="address"
             name="address"
             value={address}

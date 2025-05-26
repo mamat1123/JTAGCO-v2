@@ -23,7 +23,7 @@ export function CreateCompanyForm({ onSubmit }: CreateCompanyFormProps) {
     credit: 0,
     tax_id: "",
     branch: "",
-    business_type_id: "",
+    business_type_id: undefined,
   });
 
   useEffect(() => {
@@ -55,7 +55,7 @@ export function CreateCompanyForm({ onSubmit }: CreateCompanyFormProps) {
       const submitData = {
         ...formData,
         credit,
-        business_type_id: formData.business_type_id || undefined
+        business_type_id: formData.business_type_id || 0
       };
 
       await onSubmit(submitData);
@@ -77,7 +77,14 @@ export function CreateCompanyForm({ onSubmit }: CreateCompanyFormProps) {
   const handleBusinessTypeChange = (value: string) => {
     setFormData(prev => ({
       ...prev,
-      business_type_id: value
+      business_type_id: value ? parseInt(value) : undefined
+    }));
+  };
+
+  const handleBusinessTypeDetailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      business_type_detail: e.target.value
     }));
   };
 
@@ -99,6 +106,7 @@ export function CreateCompanyForm({ onSubmit }: CreateCompanyFormProps) {
               businessTypes={businessTypes}
               onChange={handleChange}
               onBusinessTypeChange={handleBusinessTypeChange}
+              onBusinessTypeDetailChange={handleBusinessTypeDetailChange}
             />
 
             <div className="flex justify-end space-x-2">

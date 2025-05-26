@@ -1,5 +1,5 @@
 import { companyAPI } from '@/entities/Company/companyAPI';
-import { Company, CompanyFilters, CompanyResponse, CreateCompanyDTO } from '@/entities/Company/company';
+import { Company, CompanyFilters, CompanyResponse, CreateCompanyDTO, UpdateCompanyDTO } from '@/entities/Company/company';
 
 export class CompaniesService {
   static async fetchCompanies(filters: CompanyFilters = {}): Promise<CompanyResponse> {
@@ -15,7 +15,7 @@ export class CompaniesService {
     return companyAPI.createCompany(company);
   }
 
-  static async updateCompany(id: string, company: Partial<Company>): Promise<Company> {
+  static async updateCompany(id: string, company: Partial<UpdateCompanyDTO>): Promise<Company> {
     return companyAPI.updateCompany(id, company);
   }
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Company } from '@/entities/Company/company';
+import { Company, UpdateCompanyDTO } from '@/entities/Company/company';
 import { CompaniesService } from '@/features/Sales/services/CompaniesService';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/sha
 import { toast } from 'sonner';
 import { BasicInfoForm } from '@/features/Sales/components/BasicInfoForm';
 import { AddressForm } from '@/features/Sales/components/AddressForm';
+import { BusinessDetailsForm } from '@/features/Sales/components/BusinessDetailsForm';
 import { BusinessTypeDto } from '@/entities/BusinessType/businessType';
 import { BusinessTypeService } from '@/entities/BusinessType/businessTypeAPI';
 
@@ -17,11 +18,9 @@ export function EditCompany() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [businessTypes, setBusinessTypes] = useState<BusinessTypeDto[]>([]);
-  const [company, setCompany] = useState<Company>({
-    id: '',
-    created_at: '',
+  const [company, setCompany] = useState<UpdateCompanyDTO>({
     name: '',
-    business_type_id: 0,
+    business_type_id: undefined,
     tax_id: null,
     branch: null,
     address: null,
@@ -30,7 +29,6 @@ export function EditCompany() {
     email: null,
     position: null,
     previous_model: null,
-    issues_encountered_list: '',
     old_price: 0,
     job_description: null,
     total_employees: null,
@@ -39,12 +37,10 @@ export function EditCompany() {
     business_type_detail: null,
     competitor_details: null,
     sub_district: null,
-    updated_at: '',
     district: null,
     detail: null,
     zip_code: null,
-    user_id: null,
-    customers: []
+    issues_encountered_list: undefined
   });
 
   useEffect(() => {
@@ -55,7 +51,9 @@ export function EditCompany() {
           CompaniesService.fetchCompany(id),
           BusinessTypeService.getAll()
         ]);
-        setCompany(companyData);
+        // Remove properties that should not exist in UpdateCompanyDTO
+        const { id: _, created_at: __, updated_at: ___, customers: ____, user_id: _____, ...updateData } = companyData;
+        setCompany(updateData);
         setBusinessTypes(businessTypesData);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -74,14 +72,14 @@ export function EditCompany() {
       if (!id) return;
       await CompaniesService.updateCompany(id, company);
       toast.success('อัพเดทข้อมูลบริษัทสำเร็จ');
-      navigate('/companies');
+      navigate(`/companies/${id}`);
     } catch (error) {
       console.error('Error updating company:', error);
       toast.error('ไม่สามารถอัพเดทข้อมูลบริษัทได้');
     }
   };
 
-  const handleBasicInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBasicInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setCompany(prev => ({
       ...prev,
@@ -96,7 +94,14 @@ export function EditCompany() {
     }));
   };
 
-  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBusinessTypeDetailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCompany(prev => ({
+      ...prev,
+      business_type_detail: e.target.value
+    }));
+  };
+
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setCompany(prev => ({
       ...prev,
@@ -122,7 +127,10 @@ export function EditCompany() {
   const handlePositionChange = (lat: number, lng: number) => {
     setCompany(prev => ({
       ...prev,
-      position: `${lat},${lng}`
+      position: {
+        lat: lat.toString(),
+        lng: lng.toString()
+      }
     }));
   };
 
@@ -142,15 +150,17 @@ export function EditCompany() {
             </CardHeader>
             <CardContent className="space-y-3 sm:space-y-4">
               <BasicInfoForm
-                name={company.name}
+                business_type_detail={company.business_type_detail || ''}
+                name={company.name || ''}
                 tax_id={company.tax_id || ''}
-                business_type_id={company.business_type_id.toString()}
+                business_type_id={company.business_type_id}
                 branch={company.branch || ''}
                 email={company.email || ''}
-                credit={company.credit}
+                credit={company.credit || 0}
                 businessTypes={businessTypes}
                 onChange={handleBasicInfoChange}
                 onBusinessTypeChange={handleBusinessTypeChange}
+                onBusinessTypeDetailChange={handleBusinessTypeDetailChange}
               />
             </CardContent>
           </Card>
@@ -165,8 +175,8 @@ export function EditCompany() {
                 address={company.address || ''}
                 province={company.province || ''}
                 zipCode={company.zipCode || ''}
-                latitude={company.position ? parseFloat(company.position.split(',')[0]) : undefined}
-                longitude={company.position ? parseFloat(company.position.split(',')[1]) : undefined}
+                latitude={company.position ? parseFloat(company.position.lat || '0') : undefined}
+                longitude={company.position ? parseFloat(company.position.lng || '0') : undefined}
                 onAddressChange={handleAddressChange}
                 onProvinceChange={handleProvinceChange}
                 onZipCodeChange={handleZipCodeChange}
@@ -178,61 +188,21 @@ export function EditCompany() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg sm:text-xl">ข้อมูลเพิ่มเติม</CardTitle>
-            <CardDescription>รายละเอียดเพิ่มเติมของบริษัท</CardDescription>
+            <CardTitle className="text-lg sm:text-xl">รายละเอียดธุรกิจ</CardTitle>
+            <CardDescription>ข้อมูลเพิ่มเติมเกี่ยวกับธุรกิจ</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 sm:space-y-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="detail">รายละเอียดบริษัท</Label>
-                <Input
-                  id="detail"
-                  name="detail"
-                  value={company.detail || ''}
-                  onChange={handleBasicInfoChange}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="business_type_detail">รายละเอียดประเภทธุรกิจ</Label>
-                <Input
-                  id="business_type_detail"
-                  name="business_type_detail"
-                  value={company.business_type_detail || ''}
-                  onChange={handleBasicInfoChange}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="competitor_details">รายละเอียดคู่แข่ง</Label>
-                <Input
-                  id="competitor_details"
-                  name="competitor_details"
-                  value={company.competitor_details || ''}
-                  onChange={handleBasicInfoChange}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="job_description">รายละเอียดงาน</Label>
-                <Input
-                  id="job_description"
-                  name="job_description"
-                  value={company.job_description || ''}
-                  onChange={handleBasicInfoChange}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="issues_encountered_list">รายละเอียดปัญหา</Label>
-                <Input
-                  id="issues_encountered_list"
-                  name="issues_encountered_list"
-                  value={company.issues_encountered_list}
-                  onChange={handleBasicInfoChange}
-                />
-              </div>
-            </div>
+            <BusinessDetailsForm
+              detail={company.detail ?? null}
+              jobDescription={company.job_description ?? null}
+              totalEmployees={company.total_employees ?? null}
+              orderCycle={company.order_cycle ?? null}
+              previousModel={company.previous_model ?? null}
+              competitorDetails={company.competitor_details ?? null}
+              oldPrice={company.old_price ?? null}
+              issuesEncounteredList={company.issues_encountered_list ?? null}
+              onChange={handleBasicInfoChange}
+            />
           </CardContent>
         </Card>
 
