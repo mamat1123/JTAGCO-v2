@@ -11,7 +11,8 @@ import { EditCompany } from '@/features/Sales/pages/EditCompanyPage';
 import { CreateCompanyPage } from "@/features/Sales/pages/CreateCompanyPage";
 import ProductsPage from '@/features/Settings/Products/ProductsPage';
 import SettingsPage from '@/features/Settings/SettingsPage';
-import EventsPage from '@/features/Events/EventsPage';
+import EventsPage from '@/features/Events/pages/EventsPage';
+import { CreateEventPage } from '@/features/Events/pages/CreateEventPage';
 
 export const router = createBrowserRouter([
   {
@@ -69,6 +70,10 @@ export const router = createBrowserRouter([
       {
         path: '/events',
         element: <EventsPage />,
+      },
+      {
+        path: "/companies/:companyId/events/create",
+        element: <CreateEventPage />,
       },
     ],
   },

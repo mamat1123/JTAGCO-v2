@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useEvents, useDeleteEvent } from './hooks/useEvents';
+import { useEvents, useDeleteEvent } from '../hooks/useEvents';
 import { Event, EventStatus } from '@/entities/Event/types';
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';

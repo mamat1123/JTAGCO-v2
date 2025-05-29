@@ -108,7 +108,7 @@ export function EventDetailModal({ event, onClose }: EventDetailModalProps) {
                 {displayEvent.eventImages && displayEvent.eventImages.length > 0 && (
                   <div className="pt-4">
                     <h4 className="font-medium mb-2 text-base sm:text-lg">Images</h4>
-                    <ImageGallery images={displayEvent.eventImages} />
+                    <ImageGallery images={displayEvent.eventImages} bucket="events" isPrivate={true} />
                   </div>
                 )}
               </div>

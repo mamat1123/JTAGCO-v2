@@ -1,6 +1,12 @@
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createClient } from '@supabase/supabase-js';
 
-export const supabase = createClientComponentClient({
-  supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
-  supabaseKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
-}); 
+export const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY,
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+    }
+  }
+);

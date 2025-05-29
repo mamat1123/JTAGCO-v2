@@ -117,7 +117,7 @@ export function CompaniesList() {
             <TableBody>
               {companies.map((company, index) => (
                 <TableRow 
-                  key={company.id}
+                  key={`${company.id}-${index}`}
                   ref={index === companies.length - 1 ? lastCompanyElementRef : null}
                   className="cursor-pointer hover:bg-gray-100"
                   onClick={() => handleRowClick(company.id)}

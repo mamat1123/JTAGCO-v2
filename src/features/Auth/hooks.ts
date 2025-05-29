@@ -4,27 +4,47 @@ import { AuthService } from './AuthService';
 import { LoginCredentials, RegisterCredentials } from '@/entities/User/user';
 import { useProfile } from '@/features/Profile/hooks/useProfile';
 
+export const useSetSupabaseSession = () => {
+  const setSession = useAuthStore((state) => state.setSession);
+  const setUser = useAuthStore((state) => state.setUser);
+
+  const setSupabaseSession = async (accessToken: string, refreshToken: string) => {
+    try {
+      const { session, user } = await AuthService.setSupabaseSession(accessToken, refreshToken);
+      
+      if (session) {
+        setSession(session);
+      }
+      
+      if (user) {
+        setUser(user);
+      }
+
+      return { session, user };
+    } catch (error) {
+      console.error('Failed to set Supabase session:', error);
+      throw error;
+    }
+  };
+
+  return { setSupabaseSession };
+};
+
 export const useLogin = () => {
   const navigate = useNavigate();
-  const setUser = useAuthStore((state) => state.setUser);
-  const setSession = useAuthStore((state) => state.setSession);
   const { fetchProfileByUserId } = useProfile();
+  const { setSupabaseSession } = useSetSupabaseSession();
 
   const login = async (credentials: LoginCredentials) => {
     try {
       const response = await AuthService.login(credentials);
       
-      // First set the session
-      setSession(response.session);
-      // Then set the user
-      setUser(response.user);
-      
-      // Wait a bit to ensure the session is set before fetching profile
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Set Supabase session with tokens from backend
+      const { user } = await setSupabaseSession(response.session.access_token, response.session.refresh_token);
       
       // Fetch user profile after successful login
-      if (response.user?.id) {
-        await fetchProfileByUserId(response.user.id);
+      if (user?.id) {
+        await fetchProfileByUserId(user.id);
       }
       
       navigate('/dashboard');

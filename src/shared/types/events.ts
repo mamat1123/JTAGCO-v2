@@ -62,17 +62,22 @@ export interface CalendarProps {
   className?: string;
 }
 
+export interface EventProduct {
+  variant_id: string;
+  quantity: number;
+}
+
 export interface CreateEventDto {
-  title: string;
-  date: string;
-  startTime?: string;
-  endTime?: string;
-  description?: string;
-  location?: string;
-  company_id?: string;
-  status?: EventStatus;
-  main_type_id?: string;
-  sub_type_id?: string;
+  description: string;
+  scheduled_at: string;
+  test_start_at: string;
+  test_end_at: string;
+  main_type_id: string;
+  sub_type_id: string;
+  company_id: string;
+  customer_id: string;
+  image_urls: string[];
+  products: EventProduct[];
 }
 
 export interface UpdateEventDto extends Partial<CreateEventDto> {

@@ -66,7 +66,7 @@ const data = {
         },
         {
           title: "ข้อมูลลูกค้าของฉัน",
-          url: "#",
+          url: "/sales?tab=customers",
         },
         {
           title: "ข้อมูลพนักงานขาย",

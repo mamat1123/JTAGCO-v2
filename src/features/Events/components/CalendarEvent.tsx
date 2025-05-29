@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { cn } from "@/lib/utils";
 import { CalendarProps, CalendarEvent, EventStatus } from "@/shared/types/events";
@@ -8,6 +8,7 @@ import { Skeleton } from "@/shared/components/ui/skeleton";
 import { startOfMonth, endOfMonth } from "date-fns";
 import { EventModal } from "./EventModal";
 import { EventFilter } from "./EventFilter";
+import { useNavigate } from "react-router-dom";
 
 const WEEK_DAYS = [
   { key: 'sun', label: 'S' },
@@ -90,6 +91,7 @@ const DayCell: React.FC<{
 };
 
 export function Calendar({ className }: Omit<CalendarProps, "events">) {
+  const navigate = useNavigate();
   const [currentDate, setCurrentDate] = React.useState(new Date());
   const [selectedDate, setSelectedDate] = React.useState<Date | null>(null);
   const [selectedEvents, setSelectedEvents] = React.useState<CalendarEvent[]>([]);
@@ -180,9 +182,9 @@ export function Calendar({ className }: Omit<CalendarProps, "events">) {
       <EventFilter onFilterChange={handleFilterChange} />
       <div className="flex items-center justify-between my-4">
         <h2 className="text-lg sm:text-xl font-semibold">
-        {currentDate.toLocaleString('th-TH', { month: 'long', year: 'numeric' })}
+          {currentDate.toLocaleString('th-TH', { month: 'long', year: 'numeric' })}
         </h2>
-        <div className="flex gap-1">
+        <div className="flex gap-2">
           <Button
             variant="outline"
             size="icon"

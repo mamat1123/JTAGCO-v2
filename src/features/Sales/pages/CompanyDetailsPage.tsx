@@ -15,12 +15,24 @@ import { CustomerPage } from "@/features/Customer/components/CustomerPage";
 import { BusinessTypeDto } from "@/entities/BusinessType/businessType";
 import { BusinessTypeService } from "@/entities/BusinessType/businessTypeAPI";
 import { CompanyEvents } from "@/features/Sales/components/CompanyEvents";
+import { CompaniesService } from "@/features/Sales/services/CompaniesService";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { toast } from "sonner";
+import { PlusCircle } from "lucide-react";
 
 export function CompanyDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { currentCompany, fetchCompany } = useCompanyStore();
   const [businessTypes, setBusinessTypes] = useState<BusinessTypeDto[]>([]);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,6 +49,19 @@ export function CompanyDetails() {
     fetchData();
   }, [id, fetchCompany]);
 
+  const handleDelete = async () => {
+    if (!id) return;
+
+    try {
+      await CompaniesService.deleteCompany(id);
+      toast.success("ลบบริษัทสำเร็จ");
+      navigate('/companies');
+    } catch (error) {
+      console.error('Error deleting company:', error);
+      toast.error("เกิดข้อผิดพลาดในการลบบริษัท");
+    }
+  };
+
   if (!currentCompany) {
     return <div className="text-center py-4">Company not found</div>;
   }
@@ -49,9 +74,24 @@ export function CompanyDetails() {
 
   return (
     <div className="container mx-auto px-4 py-4 sm:py-6 space-y-4 sm:space-y-6">
+      <Button
+        variant="outline"
+        onClick={() => navigate('/companies')}
+        className="w-full sm:w-auto"
+      >
+        กลับไปยังรายการบริษัท
+      </Button>
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0">
         <h1 className="text-xl sm:text-2xl font-bold">รายละเอียดบริษัท</h1>
         <div className="flex flex-col sm:flex-row gap-2">
+          <Button
+            onClick={() => navigate(`/companies/${id}/events/create`)}
+            className="w-full sm:w-auto"
+            variant="default"
+          >
+            <PlusCircle className="mr-2 h-4 w-4" />
+            สร้างกิจกรรม
+          </Button>
           <Button
             onClick={() => navigate(`/companies/${id}/edit`)}
             className="w-full sm:w-auto"
@@ -59,14 +99,39 @@ export function CompanyDetails() {
             แก้ไขข้อมูล
           </Button>
           <Button
-            variant="outline"
-            onClick={() => navigate('/companies')}
+            variant="destructive"
+            onClick={() => setIsDeleteDialogOpen(true)}
             className="w-full sm:w-auto"
           >
-            กลับไปยังรายการบริษัท
+            ลบ
           </Button>
         </div>
       </div>
+
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>ยืนยันการลบ</DialogTitle>
+            <DialogDescription>
+              คุณต้องการลบบริษัท {currentCompany.name} ใช่หรือไม่? การกระทำนี้ไม่สามารถย้อนกลับได้
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+            >
+              ยกเลิก
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+            >
+              ลบ
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6">
         {/* ข้อมูลพื้นฐาน */}
