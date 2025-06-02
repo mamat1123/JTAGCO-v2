@@ -34,3 +34,12 @@ export interface CreateCustomerDTO {
   phone?: string;
   line_id?: string;
 }
+
+export interface UpdateCustomerDto {
+  company_id: string;
+  contact_name?: string;
+  position?: string;
+  email?: string;
+  phone?: string;
+  line_id?: string;
+}

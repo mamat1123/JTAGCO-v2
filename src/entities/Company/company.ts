@@ -52,7 +52,6 @@ export interface UpdateCompanyDTO {
   branch?: string | null;
   address?: string | null;
   province?: string | null;
-  zipCode?: string | null;
   email?: string | null;
   position?: Position | null;
   previous_model?: string | null;
@@ -67,7 +66,7 @@ export interface UpdateCompanyDTO {
   sub_district?: string | null;
   district?: string | null;
   detail?: string | null;
-  zip_code?: string | null;
+  zip_code?: number | null;
 }
 
 export interface CompanyResponse {

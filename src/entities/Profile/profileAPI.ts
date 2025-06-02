@@ -1,4 +1,4 @@
-import { Profile, Profiles, UpdateProfileDTO } from './profile';
+import { Profile, Profiles, UpdateProfileDTO, UpdateLastActiveResponse, ProfileApprovalPayload } from './profile';
 import { api } from '@/shared/config/api';
 
 export const profileAPI = {
@@ -14,6 +14,18 @@ export const profileAPI = {
 
   async updateProfile(profile: UpdateProfileDTO): Promise<Profile> {
     const response = await api.patch<Profile>('/profiles', profile);
+    return response.data;
+  },
+
+  async updateLastActive(): Promise<UpdateLastActiveResponse> {
+    const response = await api.post<UpdateLastActiveResponse>('/profiles/last-active');
+    return response.data;
+  },
+
+  async approveProfile(payload: ProfileApprovalPayload): Promise<Profile> {
+    const response = await api.post<Profile>(`/profiles/${payload.profileId}/approve`, {
+      status: payload.status,
+    });
     return response.data;
   }
 }; 

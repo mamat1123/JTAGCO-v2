@@ -26,8 +26,16 @@ export function CustomerPage() {
 
   const handleEditCustomer = async (customer: Customer) => {
     if (!currentCompany?.id) return;
+    const body = {
+      company_id: currentCompany.id,
+      contact_name: customer.contact_name,
+      position: customer.position,
+      email: customer.email,
+      phone: customer.phone,
+      line_id: customer.line_id
+    }
     try {
-      await customerAPI.updateCustomer(customer.id, customer);
+      await customerAPI.updateCustomer(customer.id, body);
       toast.success("แก้ไขข้อมูลผู้ติดต่อสำเร็จ");
       fetchCompany(currentCompany?.id);
     } catch (error) {

@@ -1,4 +1,4 @@
-import { Customer, CustomerResponse, CustomerFilters, CreateCustomerDTO } from "./customer";
+import { Customer, CustomerResponse, CustomerFilters, CreateCustomerDTO, UpdateCustomerDto } from "./customer";
 import { api } from '@/shared/config/api';
 
 export const customerAPI = {
@@ -17,8 +17,9 @@ export const customerAPI = {
     return response.data;
   },
 
-  async updateCustomer(id: string, customer: Partial<Customer>): Promise<Customer> {
-    const response = await api.put<Customer>(`/customers/${id}`, customer);
+  async updateCustomer(id: string, customer: Partial<UpdateCustomerDto>): Promise<Customer> {
+    console.log('updateCustomer API');
+    const response = await api.patch<Customer>(`/customers/${id}`, customer);
     return response.data;
   },
 

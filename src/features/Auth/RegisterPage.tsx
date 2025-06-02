@@ -10,6 +10,7 @@ import { UserRole, ROLE_OPTIONS } from '@/shared/types/roles';
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
     name: '',
+    fullname: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -39,7 +40,8 @@ export default function RegisterPage() {
         username: formData.username,
         email: formData.email,
         phone: formData.phone,
-        role: formData.role
+        role: formData.role,
+        fullname: formData.fullname,
       });
     } catch (err) {
       setError('การลงทะเบียนล้มเหลว');
@@ -69,6 +71,17 @@ export default function RegisterPage() {
                 value={formData.username}
                 onChange={handleChange}
                 placeholder="ชื่อผู้ใช้"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="fullname">ชื่อ-นามสกุล</Label>
+              <Input
+                id="fullname"
+                name="fullname"
+                value={formData.fullname}
+                onChange={handleChange}
+                placeholder="ชื่อ-นามสกุล"
                 required
               />
             </div>

@@ -1,4 +1,4 @@
-import { Product, CreateProductDTO, UpdateProductDTO, ProductVariant, CreateProductVariantDTO, UpdateProductVariantDTO } from './product';
+import { Product, CreateProductDTO, ProductVariant, CreateProductVariantDTO } from './product';
 import { api } from '@/shared/config/api';
 
 export const productAPI = {

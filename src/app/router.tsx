@@ -6,13 +6,13 @@ import { DashboardLayout } from '@/layouts/DashboardLayout';
 import DashboardPage from '@/features/Dashboard/DashboardPage';
 import { SaleDashboardPage } from '@/features/Sales/SalesPage';
 import { CompanyDetails } from "@/features/Sales/pages/CompanyDetailsPage";
-import { CompaniesList } from "@/features/Sales/components/CompaniesList";
 import { EditCompany } from '@/features/Sales/pages/EditCompanyPage';
 import { CreateCompanyPage } from "@/features/Sales/pages/CreateCompanyPage";
 import ProductsPage from '@/features/Settings/Products/ProductsPage';
 import SettingsPage from '@/features/Settings/SettingsPage';
 import EventsPage from '@/features/Events/pages/EventsPage';
 import { CreateEventPage } from '@/features/Events/pages/CreateEventPage';
+import { ApproveUserPage } from '@/features/Settings/Users/ApproveUserPage';
 
 export const router = createBrowserRouter([
   {
@@ -92,6 +92,10 @@ export const router = createBrowserRouter([
       {
         path: 'products',
         element: <ProductsPage />,
+      },
+      {
+        path: 'users',
+        element: <ApproveUserPage />,
       },
     ],
   }

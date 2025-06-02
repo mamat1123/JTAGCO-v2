@@ -3,15 +3,13 @@ import { format, startOfMonth, endOfMonth, isToday } from "date-fns";
 import { th } from "date-fns/locale";
 import { useState, useRef } from "react";
 import { useEvents } from "../services/eventService";
-import { User, Building2, Tag, Clock, ChevronLeft, ChevronRight, Calendar } from "lucide-react";
+import { User, Building2, ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
-import { toast, Toaster } from 'sonner';
+import { toast } from 'sonner';
 import { EventDetailModal } from "./EventDetailModal";
 import { EventFilter, EventFilters } from "./EventFilter";
 import { EventStatus } from "@/shared/types/events";
 import { Skeleton } from "@/shared/components/ui/skeleton";
-
-const EVENTS_PER_DAY = 3;
 
 const getEventTypeClass = (event: CalendarEvent) => {
   const { sub_type_id } = event;
@@ -181,7 +179,7 @@ export function EventsList() {
           </div>
         ) : (
           sortedDates.map((date) => {
-            const dayEvents = groupedEvents[date].slice(0, EVENTS_PER_DAY);
+            const dayEvents = groupedEvents[date];
             const isCurrentDate = isToday(new Date(date));
 
             return (

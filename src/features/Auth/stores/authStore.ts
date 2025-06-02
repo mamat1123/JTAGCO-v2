@@ -1,16 +1,16 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { AuthState, User, Session } from '@/entities/User/user';
+import { AuthState, AuthUser, Session } from '@/entities/User/user';
 
 const STORAGE_KEY = 'auth-storage';
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       user: null,
       session: null,
       isAuthenticated: false,
-      setUser: (user: User | null) => set((state) => ({ 
+      setUser: (user: AuthUser | null) => set((state) => ({ 
         user, 
         isAuthenticated: !!user && !!state.session 
       })),

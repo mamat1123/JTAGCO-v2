@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useCompanyStore } from "@/features/Sales/stores/companyStore";
-import { CustomerList } from "@/features/Customer/components/CustomerList";
 import {
   Card,
   CardContent,

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import {
@@ -11,8 +11,7 @@ import {
 } from '@/shared/components/ui/dialog';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
-import { ProductVariant, CreateProductVariantDTO, Product, ProductType } from '@/entities/Product/product';
-import { productAPI } from '@/entities/Product/productAPI';
+import { CreateProductVariantDTO } from '@/entities/Product/product';
 import {
   Select,
   SelectContent,
@@ -20,10 +19,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select"
-import {
-  RadioGroup,
-  RadioGroupItem,
-} from "@/shared/components/ui/radio-group"
 import {
   Tooltip,
   TooltipContent,
@@ -36,7 +31,6 @@ import { SizeRangeInput } from './ProductVariant/SizeRangeInput';
 import { ColorSelector } from './ProductVariant/ColorSelector';
 import { ImageUploader } from '@/shared/components/ImageUploader';
 import { SteelPlateSelector } from './ProductVariant/SteelPlateSelector';
-import { InsoleSelector } from './ProductVariant/InsoleSelector';
 import { AttributeList } from './ProductVariant/AttributeList';
 import { ProductTypeSelector } from './ProductVariant/ProductTypeSelector';
 
@@ -88,25 +82,6 @@ export function ProductVariantFormDialog({
     console.log(formData);
   }, [formData]);
 
-  // Reset form function
-  const resetForm = () => {
-    setFormData({
-      product_id: productId,
-      sku: '',
-      attributes: {},
-      is_made_to_order: false,
-      price: 0,
-      stock: 0,
-    });
-    setSelectedAttributeType("");
-    setAttributeValue("");
-    setCustomAttributeKey("");
-    setIsCustomAttribute(false);
-    setSizeRange({ min: 0, max: 0 });
-    setSelectedColors([]);
-    setCustomColor("");
-    setSteelPlateValue("");
-  };
 
   // Handle modal close
   const handleOpenChange = (open: boolean) => {
@@ -201,44 +176,6 @@ export function ProductVariantFormDialog({
     }
   };
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Validate file type
-      const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-      if (!validTypes.includes(file.type)) {
-        alert('กรุณาเลือกไฟล์รูปภาพเท่านั้น (JPEG, PNG, GIF, WEBP)');
-        return;
-      }
-
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        alert('ขนาดไฟล์ต้องไม่เกิน 5MB');
-        return;
-      }
-
-      // Create preview URL
-      const previewUrl = URL.createObjectURL(file);
-      setFormData(prev => ({
-        ...prev,
-        attributes: {
-          ...prev.attributes,
-          image: previewUrl
-        }
-      }));
-    }
-  };
-
-  const handleImageRemove = () => {
-    setFormData(prev => ({
-      ...prev,
-      attributes: {
-        ...prev.attributes,
-        image: undefined
-      }
-    }));
-  };
-
   const handleAddAttribute = () => {
     if (!selectedAttributeType) return;
 
@@ -284,12 +221,12 @@ export function ProductVariantFormDialog({
     }));
   };
 
-  const handleImageUploaded = (url: string) => {
+  const handleImageUploaded = (urls: string[]) => {
     setFormData(prev => ({
       ...prev,
       attributes: {
         ...prev.attributes,
-        image: url
+        image: urls[0]
       }
     }));
   };

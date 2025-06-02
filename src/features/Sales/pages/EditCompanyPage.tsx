@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Company, UpdateCompanyDTO } from '@/entities/Company/company';
+import { UpdateCompanyDTO } from '@/entities/Company/company';
 import { CompaniesService } from '@/features/Sales/services/CompaniesService';
 import { Button } from '@/shared/components/ui/button';
-import { Input } from '@/shared/components/ui/input';
-import { Label } from '@/shared/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/components/ui/card';
 import { toast } from 'sonner';
 import { BasicInfoForm } from '@/features/Sales/components/BasicInfoForm';
@@ -25,13 +23,13 @@ export function EditCompany() {
     branch: null,
     address: null,
     province: null,
-    zipCode: null,
+    zip_code: 0,
     email: null,
     position: null,
     previous_model: null,
     old_price: 0,
     job_description: null,
-    total_employees: null,
+    total_employees: 0,
     credit: 0,
     order_cycle: 0,
     business_type_detail: null,
@@ -39,7 +37,6 @@ export function EditCompany() {
     sub_district: null,
     district: null,
     detail: null,
-    zip_code: null,
     issues_encountered_list: undefined
   });
 
@@ -53,7 +50,10 @@ export function EditCompany() {
         ]);
         // Remove properties that should not exist in UpdateCompanyDTO
         const { id: _, created_at: __, updated_at: ___, customers: ____, user_id: _____, ...updateData } = companyData;
-        setCompany(updateData);
+        setCompany({
+          ...updateData,
+          zip_code: updateData.zip_code ? Number(updateData.zip_code) : 0
+        });
         setBusinessTypes(businessTypesData);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -83,7 +83,9 @@ export function EditCompany() {
     const { name, value } = e.target;
     setCompany(prev => ({
       ...prev,
-      [name]: value
+      [name]: name === 'old_price' || name === 'total_employees' || name === 'order_cycle' || name === 'zip_code'
+        ? Number(value) || 0
+        : value
     }));
   };
 
@@ -120,7 +122,7 @@ export function EditCompany() {
     const { value } = e.target;
     setCompany(prev => ({
       ...prev,
-      zipCode: value
+      zip_code: Number(value) || 0
     }));
   };
 
@@ -140,7 +142,7 @@ export function EditCompany() {
 
   return (
     <div className="container mx-auto p-4">
-        <h1 className="text-xl sm:text-2xl font-bold mb-4">แก้ไขข้อมูลบริษัท</h1>
+      <h1 className="text-xl sm:text-2xl font-bold mb-4">แก้ไขข้อมูลบริษัท</h1>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6">
           <Card>
@@ -174,7 +176,7 @@ export function EditCompany() {
               <AddressForm
                 address={company.address || ''}
                 province={company.province || ''}
-                zipCode={company.zipCode || ''}
+                zipCode={company.zip_code?.toString() || ''}
                 latitude={company.position ? parseFloat(company.position.lat || '0') : undefined}
                 longitude={company.position ? parseFloat(company.position.lng || '0') : undefined}
                 onAddressChange={handleAddressChange}
@@ -195,11 +197,11 @@ export function EditCompany() {
             <BusinessDetailsForm
               detail={company.detail ?? null}
               jobDescription={company.job_description ?? null}
-              totalEmployees={company.total_employees ?? null}
-              orderCycle={company.order_cycle ?? null}
+              totalEmployees={company.total_employees ?? 0}
+              orderCycle={company.order_cycle ?? 0}
               previousModel={company.previous_model ?? null}
               competitorDetails={company.competitor_details ?? null}
-              oldPrice={company.old_price ?? null}
+              oldPrice={company.old_price ?? 0}
               issuesEncounteredList={company.issues_encountered_list ?? null}
               onChange={handleBasicInfoChange}
             />

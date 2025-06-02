@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { CreateCompanyDTO } from "@/entities/Company/company";
-import { CompaniesService } from "@/features/Sales/services/CompaniesService";
 import { BusinessTypeService } from "@/entities/BusinessType/businessTypeAPI";
 import { BusinessTypeDto } from "@/entities/BusinessType/businessType";
 import { Button } from "@/shared/components/ui/button";

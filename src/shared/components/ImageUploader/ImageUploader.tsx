@@ -78,7 +78,7 @@ export function ImageUploader({
         const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
         const filePath = `${folderPath}/${fileName}`;
 
-        const { data, error } = await supabase.storage
+        const { error } = await supabase.storage
           .from(bucketName)
           .upload(filePath, file);
 
@@ -117,11 +117,6 @@ export function ImageUploader({
     const index = imagePreviews.findIndex(p => p.id === id);
     setImagePreviews(prev => prev.filter(p => p.id !== id));
     onImageRemoved?.(index);
-  };
-
-  const handleRemoveAll = () => {
-    setImagePreviews([]);
-    onImageRemoved?.();
   };
 
   return (

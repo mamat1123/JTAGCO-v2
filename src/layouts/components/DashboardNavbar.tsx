@@ -45,7 +45,7 @@ export function DashboardNavbar() {
     return routeNames[path] || path
   }
 
-  const breadcrumbItems = pathSegments.map((segment, index) => {
+  const breadcrumbItems = pathSegments.map((_, index) => {
     const path = `/${pathSegments.slice(0, index + 1).join('/')}`
     const isLast = index === pathSegments.length - 1
     let routeName = getRouteName(path)

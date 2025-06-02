@@ -1,21 +1,15 @@
-import { useState, useEffect } from "react";
-import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
-import { BarChart, LineChart, Activity, Users, DollarSign, ShoppingCart } from "lucide-react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { Activity, Users, DollarSign, ShoppingCart } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 
 // Import the Calendar component
 import { Calendar } from "@/features/Events/components/CalendarEvent";
-import { CalendarEvent } from "@/entities/Calendar/calendar";
 import { CompaniesList } from "@/features/Sales/components/CompaniesList";
 import { EventsList } from "@/features/Events/components/EventsList";
 
 export function SaleDashboardPage() {
-  const [events, setEvents] = useState<CalendarEvent[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
 
   const activeTab = searchParams.get('tab') || 'calendar';
 

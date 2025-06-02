@@ -34,6 +34,7 @@ export interface CalendarEvent {
   userFullName?: string;
   subTypeName?: string;
   status?: EventStatus;
+  scheduled_at?: string;
   scheduled_at_start?: string;
   scheduled_at_end?: string;
   main_type_id?: number;

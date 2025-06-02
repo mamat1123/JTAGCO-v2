@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pencil, Trash2, Plus } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import {
   Table,
@@ -14,12 +14,6 @@ import { ProductVariantFormDialog } from './ProductVariantFormDialog';
 import { toast, Toaster } from 'sonner';
 import { productAPI } from '@/entities/Product/productAPI';
 import { ProductVariantFormSingleDialog } from "./ProductVariantFormSingleDialog";
-import type { ProductVariantFormData } from "@/shared/types/product";
-
-interface ColorWithImage {
-  color: string;
-  image: string;
-}
 
 interface ProductVariantsProps {
   productId: string;
@@ -80,12 +74,8 @@ export function ProductVariants({ productId, variants, onAdd, onUpdate, onDelete
     if (!selectedVariant) return;
     
     try {
-      // TODO: Implement your API call here
-      // await updateProductVariant(selectedVariant.id, data);
-      
-      // Refresh the variants list
-      // await fetchVariants();
-      
+
+      console.log(data);      
       setIsEditDialogOpen(false);
       setSelectedVariant(undefined);
     } catch (error) {

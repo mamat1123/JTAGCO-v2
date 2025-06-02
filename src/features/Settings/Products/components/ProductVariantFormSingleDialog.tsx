@@ -20,7 +20,6 @@ import {
   CommandItem,
   CommandList,
 } from "@/shared/components/ui/command";
-import { cn } from "@/shared/lib/utils";
 
 interface ProductVariantFormSingleDialogProps {
   open: boolean;
@@ -46,7 +45,6 @@ export function ProductVariantFormSingleDialog({
 
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddingAttribute, setIsAddingAttribute] = useState(false);
-  const [newAttributeKey, setNewAttributeKey] = useState("");
 
   useEffect(() => {
     if (variant) {
@@ -88,7 +86,6 @@ export function ProductVariantFormSingleDialog({
       },
     }));
     setIsAddingAttribute(false);
-    setNewAttributeKey("");
   };
 
   const removeAttribute = (key: string) => {

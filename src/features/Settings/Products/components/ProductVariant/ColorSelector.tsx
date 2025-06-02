@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Plus, X } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
@@ -43,56 +43,11 @@ export function ColorSelector({
   onColorRemove,
   customColor,
   onCustomColorChange,
-  onCustomColorAdd,
   productId,
 }: ColorSelectorProps) {
   const [openColorPopover, setOpenColorPopover] = useState(false);
   const [selectedColor, setSelectedColor] = useState<string>("");
   const [showImageUploader, setShowImageUploader] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>("");
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Validate file type
-      const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-      if (!validTypes.includes(file.type)) {
-        alert('กรุณาเลือกไฟล์รูปภาพเท่านั้น (JPEG, PNG, GIF, WEBP)');
-        return;
-      }
-
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        alert('ขนาดไฟล์ต้องไม่เกิน 5MB');
-        return;
-      }
-
-      setSelectedImage(file);
-
-      // Create preview URL
-      const previewUrl = URL.createObjectURL(file);
-      setImagePreview(previewUrl);
-
-      // Add color with image
-      onColorSelect({ color: selectedColor, image: previewUrl });
-
-      // Reset states
-      setSelectedColor("");
-      setShowImageUploader(false);
-      setSelectedImage(null);
-      setImagePreview("");
-    }
-  };
-
-  const handleImageRemove = () => {
-    setSelectedImage(null);
-    setImagePreview("");
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
 
   const handleColorSelect = (color: string) => {
     setSelectedColor(color);
@@ -108,8 +63,8 @@ export function ColorSelector({
     }
   };
 
-  const handleImageUploaded = (url: string) => {
-    onColorSelect({ color: selectedColor, image: url });
+  const handleImageUploaded = (urls: string[]) => {
+    onColorSelect({ color: selectedColor, image: urls[0] });
     setShowImageUploader(false);
     setSelectedColor("");
   };

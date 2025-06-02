@@ -40,3 +40,8 @@ export interface QueryEventParams {
   main_type_id?: string;
   sub_type_id?: string;
 } 
+
+export interface EventCheckinDto {
+  detail?: string;
+  images?: string[];
+}
