@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import LoginPage from '@/features/Auth/LoginPage';
 import RegisterPage from '@/features/Auth/RegisterPage';
 import { ProtectedRoute } from '@/features/Auth/ProtectedRoute';
+import { SuperAdminRoute } from '@/features/Auth/SuperAdminRoute';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import DashboardPage from '@/features/Dashboard/DashboardPage';
 import { SaleDashboardPage } from '@/features/Sales/SalesPage';
@@ -95,7 +96,11 @@ export const router = createBrowserRouter([
       },
       {
         path: 'users',
-        element: <ApproveUserPage />,
+        element: (
+          <SuperAdminRoute>
+            <ApproveUserPage />
+          </SuperAdminRoute>
+        ),
       },
     ],
   }

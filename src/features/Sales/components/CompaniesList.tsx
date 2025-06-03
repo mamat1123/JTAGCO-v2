@@ -13,9 +13,12 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/shared/components/ui/button";
 import { Plus } from "lucide-react";
 import { CompanyFilter, CompanyFilters } from "./CompanyFilter";
+import { useProfile } from "@/features/Profile/hooks/useProfile";
+import { UserRole } from "@/shared/types/roles";
 
 export function CompaniesList() {
   const navigate = useNavigate();
+  const { profile } = useProfile();
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,6 +50,7 @@ export function CompaniesList() {
 
   useEffect(() => {
     const fetchCompanies = async () => {
+      console.log(profile);
       try {
         setLoading(true);
         const response = await CompaniesService.fetchCompanies({
@@ -54,7 +58,7 @@ export function CompaniesList() {
           limit: itemsPerPage,
           search: filters.search,
           province: filters.province === 'all' ? undefined : filters.province,
-          user_id: filters.user_id === 'all' ? undefined : filters.user_id
+          user_id: profile?.role === UserRole.SALES ? profile.id : (filters.user_id === 'all' ? undefined : filters.user_id)
         });
         
         if (page === 1) {
@@ -77,7 +81,7 @@ export function CompaniesList() {
     };
 
     fetchCompanies();
-  }, [page, filters]);
+  }, [page, filters, profile?.role, profile?.user_id]);
 
   const handleRowClick = (companyId: string) => {
     navigate(`/companies/${companyId}`);
@@ -90,7 +94,10 @@ export function CompaniesList() {
   return (
     <div className="space-y-4 w-full">
       <div className="flex flex-col md:flex-row justify-between gap-4">
-        <CompanyFilter onFilterChange={handleFilterChange} />
+        {/* Only show filter if user is not sales role */}
+        {profile?.role !== UserRole.SALES && (
+          <CompanyFilter onFilterChange={handleFilterChange} />
+        )}
         <Button
           variant="default"
           size="sm"

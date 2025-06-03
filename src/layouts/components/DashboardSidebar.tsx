@@ -26,6 +26,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/shared/components/ui/sidebar"
+import { useProfile } from "@/features/Profile/hooks/useProfile";
 
 const data = {
   user: {
@@ -69,6 +70,7 @@ const data = {
           url: "/sales?tab=customers",
         },
         {
+          disabled: true,
           title: "ข้อมูลพนักงานขาย",
           url: "#",
         },
@@ -78,9 +80,10 @@ const data = {
       title: "Notification",
       url: "#",
       icon: Bell,
-      isActive: true,
+      isActive: false,
       items: [
         {
+          disabled: true,
           title: "รอบการสั้งซื้อ",
           url: "#",
         },
@@ -90,15 +93,17 @@ const data = {
       title: "Admin",
       url: "#",
       icon: ShieldUser,
-      isActive: true,
+      isActive: false,
       items: [
         {
           title: "อนุมัติเบิกสินค้า",
           url: "#",
+          disabled: true,
         },
         {
           title: "สร้างใบเสนอราคา",
           url: "#",
+          disabled: true,
         },
       ],
     },
@@ -129,7 +134,9 @@ const data = {
 }
 
 export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { profile } = useProfile();
   const { isAuthenticated, logout } = useAuthStore();
+  console.log(profile);
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
@@ -137,9 +144,7 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <a href="#">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <Command className="size-4" />
-                </div>
+                <img src="/pwa-512x512.png" alt="JTAGCO" className="size-8" />
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">JTAGCO</span>
                   <span className="truncate text-xs">Enterprise</span>
@@ -154,7 +159,7 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
         <DashboardNavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <DashboardNavUser user={data.user} />
+        <DashboardNavUser fullname={profile?.fullname} username={profile?.username} />
       </SidebarFooter>
       <SidebarFooter>
         {isAuthenticated ? (

@@ -20,13 +20,13 @@ import {
 } from "@/shared/components/ui/sidebar"
 
 export function DashboardNavUser({
-  user,
+  fullname = "",
+  avatar = "",
+  username = "",
 }: {
-  user: {
-    name: string
-    email: string
-    avatar: string
-  }
+  fullname?: string
+  avatar?: string
+  username?: string
 }) {
 
   return (
@@ -39,12 +39,12 @@ export function DashboardNavUser({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarImage src={avatar} alt={fullname} />
+                <AvatarFallback className="rounded-lg">{fullname.charAt(0)}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{user.name}</span>
-                <span className="truncate text-xs">{user.email}</span>
+                <span className="truncate font-semibold">{fullname}</span>
+                <span className="truncate text-xs">{username}</span>
               </div>
               <User className="ml-auto size-4" />
             </SidebarMenuButton>

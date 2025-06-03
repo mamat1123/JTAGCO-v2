@@ -1,17 +1,23 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
-import { Activity, Users, DollarSign, ShoppingCart } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 
 // Import the Calendar component
 import { Calendar } from "@/features/Events/components/CalendarEvent";
 import { CompaniesList } from "@/features/Sales/components/CompaniesList";
 import { EventsList } from "@/features/Events/components/EventsList";
+import { SalesMetrics } from "./components/SalesMetrics";
+import { salesMetricsService } from "./services/salesMetricsService";
 
 export function SaleDashboardPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-
   const activeTab = searchParams.get('tab') || 'calendar';
+
+  const { data: metrics, isLoading: isLoadingMetrics } = useQuery({
+    queryKey: ['salesMetrics'],
+    queryFn: salesMetricsService.getMetrics,
+  });
 
   const handleTabChange = (value: string) => {
     setSearchParams({ tab: value });
@@ -22,59 +28,9 @@ export function SaleDashboardPage() {
       <h1 className="text-3xl font-bold tracking-tight">แดชบอร์ดการขาย</h1>
 
       {/* Sales Metrics */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">รายได้รวม</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">฿45,231.89</div>
-            <p className="text-xs text-muted-foreground">
-              +20.1% จากเดือนที่แล้ว
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">ลูกค้าใหม่</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+2,350</div>
-            <p className="text-xs text-muted-foreground">
-              +10.1% จากเดือนที่แล้ว
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">ยอดขาย</CardTitle>
-            <ShoppingCart className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+12,234</div>
-            <p className="text-xs text-muted-foreground">
-              +19% จากเดือนที่แล้ว
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">กำลังใช้งาน</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+573</div>
-            <p className="text-xs text-muted-foreground">
-              +201 จากชั่วโมงที่แล้ว
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      {!isLoadingMetrics && metrics && (
+        <SalesMetrics {...metrics} />
+      )}
 
       {/* Tabs for different views */}
       <Tabs value={activeTab} onValueChange={handleTabChange}>

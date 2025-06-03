@@ -28,6 +28,7 @@ export function DashboardNavMain({
     icon: LucideIcon
     isActive?: boolean
     items?: {
+      disabled?: boolean
       title: string
       url: string
     }[]
@@ -59,9 +60,15 @@ export function DashboardNavMain({
                       {item.items?.map((subItem) => (
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton asChild>
-                            <a href={subItem.url}>
-                              <span>{subItem.title}</span>
-                            </a>
+                            {subItem.disabled ? (
+                              <button disabled className="w-full text-left">
+                                <span>{subItem.title}</span>
+                              </button>
+                            ) : (
+                              <a href={subItem.url}>
+                                <span>{subItem.title}</span>
+                              </a>
+                            )}
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       ))}
