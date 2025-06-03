@@ -4,7 +4,6 @@ import * as React from "react"
 import { Button } from "@/shared/components/ui/button";
 import { Link } from "react-router-dom";
 import {
-  Command,
   Settings2,
   DollarSign,
   ChartPie,
