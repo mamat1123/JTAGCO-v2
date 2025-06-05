@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useCompanyStore } from "@/features/Sales/stores/companyStore";
+import { useProfile } from "@/features/Profile/hooks/useProfile";
 import {
   Card,
   CardContent,
@@ -9,7 +10,6 @@ import {
   CardTitle,
 } from "@/shared/components/ui/card";
 import { Button } from "@/shared/components/ui/button";
-import { useNavigate } from "react-router-dom";
 import { CustomerPage } from "@/features/Customer/components/CustomerPage";
 import { BusinessTypeDto } from "@/entities/BusinessType/businessType";
 import { BusinessTypeService } from "@/entities/BusinessType/businessTypeAPI";
@@ -25,11 +25,13 @@ import {
 } from "@/shared/components/ui/dialog";
 import { toast } from "sonner";
 import { PlusCircle } from "lucide-react";
+import { UserRole } from "@/shared/types/roles";
 
 export function CompanyDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { currentCompany, fetchCompany } = useCompanyStore();
+  const { profile } = useProfile();
   const [businessTypes, setBusinessTypes] = useState<BusinessTypeDto[]>([]);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
@@ -65,8 +67,27 @@ export function CompanyDetails() {
     return <div className="text-center py-4">Company not found</div>;
   }
 
+  // Check if user has access to view this company
+  const isSuperAdmin = profile?.role === UserRole.SUPER_ADMIN;
+  const isSalesUser = profile?.role === UserRole.SALES;
+  const hasAccess = isSuperAdmin || (isSalesUser && currentCompany.user_id === profile?.id);
+
+  // if (!hasAccess) {
+  //   return (
+  //     <div className="text-center py-4">
+  //       <p>คุณไม่มีสิทธิ์เข้าถึงข้อมูลบริษัทนี้</p>
+  //       <Button
+  //         variant="outline"
+  //         onClick={() => navigate('/companies')}
+  //         className="mt-4"
+  //       >
+  //         กลับไปยังรายการบริษัท
+  //       </Button>
+  //     </div>
+  //   );
+  // }
+
   const getBusinessTypeName = (id: number) => {
-    console.log(id, businessTypes);
     const businessType = businessTypes.find(type => type.id === id);
     return businessType?.name || '-';
   };
@@ -83,27 +104,34 @@ export function CompanyDetails() {
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0">
         <h1 className="text-xl sm:text-2xl font-bold">รายละเอียดบริษัท</h1>
         <div className="flex flex-col sm:flex-row gap-2">
-          <Button
-            onClick={() => navigate(`/companies/${id}/events/create`)}
-            className="w-full sm:w-auto"
-            variant="default"
-          >
-            <PlusCircle className="mr-2 h-4 w-4" />
-            สร้างกิจกรรม
-          </Button>
-          <Button
-            onClick={() => navigate(`/companies/${id}/edit`)}
-            className="w-full sm:w-auto"
-          >
-            แก้ไขข้อมูล
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={() => setIsDeleteDialogOpen(true)}
-            className="w-full sm:w-auto"
-          >
-            ลบ
-          </Button>
+          {
+            hasAccess && (
+              <>
+                <Button
+                  onClick={() => navigate(`/companies/${id}/events/create`)}
+                  className="w-full sm:w-auto"
+                  variant="default"
+                >
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  สร้างกิจกรรม
+                </Button>
+                <Button
+                  onClick={() => navigate(`/companies/${id}/edit`)}
+                  className="w-full sm:w-auto"
+                >
+                  แก้ไขข้อมูล
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => setIsDeleteDialogOpen(true)}
+                  className="w-full sm:w-auto"
+                >
+                  ลบ
+                </Button>
+              </>
+            )
+          }
+
         </div>
       </div>
 

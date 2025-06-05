@@ -18,6 +18,8 @@ import { toast } from "sonner";
 import { ImageUploader } from "@/shared/components/ImageUploader/ImageUploader";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/shared/components/ui/badge";
+import { useProfile } from "@/features/Profile/hooks/useProfile";
+import { UserRole } from "@/shared/types/roles";
 
 interface EventCheckin {
   id: number;
@@ -41,6 +43,7 @@ export function EventDetailModal({ event, onClose }: EventDetailModalProps) {
   const [showCheckinForm, setShowCheckinForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [checkinError, setCheckinError] = useState<string | null>(null);
+  const { profile } = useProfile();
 
   const displayEvent = eventDetail || event;
 
@@ -116,6 +119,20 @@ export function EventDetailModal({ event, onClose }: EventDetailModalProps) {
     return eventDate < today;
   }, [displayEvent]);
 
+  const canCheckin = useMemo(() => {
+    if (!profile || !displayEvent) return false;
+    
+    // Super admin can always check in
+    if (profile.role === UserRole.SUPER_ADMIN) return true;
+    
+    // Sales can only check in their own events
+    if (profile.role === UserRole.SALES) {
+      return profile.id === displayEvent.user_id;
+    }
+    
+    return false;
+  }, [profile, displayEvent]);
+
   return (
     <Dialog open={!!event} onOpenChange={onClose}>
       <DialogContent className="max-w-[95vw] sm:max-w-[90vw] md:max-w-[600px] w-full p-4 sm:p-6 max-h-[90vh] overflow-hidden flex flex-col">
@@ -179,7 +196,7 @@ export function EventDetailModal({ event, onClose }: EventDetailModalProps) {
                 <div className="pt-4 border-t">
                   <div className="flex items-center justify-between mb-4">
                     <h4 className="font-medium text-base sm:text-lg">Check-in</h4>
-                    {!showCheckinForm && !isEventPassed && (
+                    {!showCheckinForm && !isEventPassed && canCheckin && (
                       <Button
                         variant="outline"
                         size="sm"
@@ -190,7 +207,7 @@ export function EventDetailModal({ event, onClose }: EventDetailModalProps) {
                     )}
                   </div>
 
-                  {showCheckinForm && !isEventPassed && (
+                  {showCheckinForm && !isEventPassed && canCheckin && (
                     <div className="space-y-4">
                       {checkinError && (
                         <div className="flex items-center gap-2 p-3 rounded-lg bg-red-50 text-red-600 border border-red-200">
@@ -233,6 +250,13 @@ export function EventDetailModal({ event, onClose }: EventDetailModalProps) {
                     <div className="flex items-center gap-2 p-3 rounded-lg bg-yellow-50 text-yellow-600 border border-yellow-200">
                       <AlertCircle className="h-4 w-4 flex-shrink-0" />
                       <p className="text-sm">กิจกรรมนี้ได้ผ่านไปแล้ว ไม่สามารถเช็คอินได้</p>
+                    </div>
+                  )}
+
+                  {!canCheckin && !isEventPassed && (
+                    <div className="flex items-center gap-2 p-3 rounded-lg bg-yellow-50 text-yellow-600 border border-yellow-200">
+                      <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                      <p className="text-sm">คุณไม่มีสิทธิ์ในการเช็คอินกิจกรรมนี้</p>
                     </div>
                   )}
 
