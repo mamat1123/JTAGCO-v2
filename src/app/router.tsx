@@ -15,6 +15,7 @@ import EventsPage from '@/features/Events/pages/EventsPage';
 import { CreateEventPage } from '@/features/Events/pages/CreateEventPage';
 import { ApproveUserPage } from '@/features/Settings/Users/ApproveUserPage';
 import { ShoeRequestsPage } from '@/features/ShoeRequests/ShoeRequestsPage';
+import { AdminRoute } from '@/features/Auth/AdminRoute';
 
 export const router = createBrowserRouter([
   {
@@ -79,7 +80,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "/admin/shoe-requests",
-        element: <ShoeRequestsPage />,
+        element: (
+          <AdminRoute>
+            <ShoeRequestsPage />
+          </AdminRoute>
+        ),
       },
     ],
   },
