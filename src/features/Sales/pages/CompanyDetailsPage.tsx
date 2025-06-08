@@ -68,7 +68,7 @@ export function CompanyDetails() {
   }
 
   // Check if user has access to view this company
-  const isSuperAdmin = profile?.role === UserRole.SUPER_ADMIN;
+  const isSuperAdmin = profile?.role === UserRole.SUPER_ADMIN || profile?.role === UserRole.MANAGER;
   const isSalesUser = profile?.role === UserRole.SALES;
   const hasAccess = isSuperAdmin || (isSalesUser && currentCompany.user_id === profile?.id);
 

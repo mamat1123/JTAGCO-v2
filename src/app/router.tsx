@@ -14,6 +14,7 @@ import SettingsPage from '@/features/Settings/SettingsPage';
 import EventsPage from '@/features/Events/pages/EventsPage';
 import { CreateEventPage } from '@/features/Events/pages/CreateEventPage';
 import { ApproveUserPage } from '@/features/Settings/Users/ApproveUserPage';
+import { ShoeRequestsPage } from '@/features/ShoeRequests/ShoeRequestsPage';
 
 export const router = createBrowserRouter([
   {
@@ -75,6 +76,10 @@ export const router = createBrowserRouter([
       {
         path: "/companies/:companyId/events/create",
         element: <CreateEventPage />,
+      },
+      {
+        path: "/admin/shoe-requests",
+        element: <ShoeRequestsPage />,
       },
     ],
   },

@@ -7,7 +7,7 @@ import {
   DialogTitle,
 } from "@/shared/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { EventDetailModal } from "./EventDetailModal";
 
 interface EventModalProps {
@@ -15,6 +15,7 @@ interface EventModalProps {
   selectedEvents: CalendarEvent[];
   onClose: () => void;
   getEventTypeClass: (event: CalendarEvent) => string;
+  onDelete: (event: CalendarEvent | null) => void;
 }
 
 export function EventModal({
@@ -22,6 +23,7 @@ export function EventModal({
   selectedEvents,
   onClose,
   getEventTypeClass,
+  onDelete,
 }: EventModalProps) {
   const [selectedUserId, setSelectedUserId] = useState<string>('all');
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
@@ -31,9 +33,13 @@ export function EventModal({
     onClose();
   };
 
+  useEffect(() => {
+    console.log("selectedEvent", selectedEvent);
+  }, [selectedEvent]);
+
   // Group events by user_id
   const groupedEvents = selectedEvents.reduce((acc, event) => {
-    const userId = event.userId || 'anonymous';
+    const userId = event.user_id || 'anonymous';
     if (!acc[userId]) {
       acc[userId] = {
         userFullName: event.userFullName || 'Anonymous',
@@ -115,7 +121,7 @@ export function EventModal({
                           </div>
                         )}
                         <div className="text-sm font-semibold">
-                          {event.subTypeName}
+                          {event.subTypeName || event.mainTypeName}
                         </div>
                         <div className="text-sm text-muted-foreground">
                           {event.companyName}
@@ -143,6 +149,7 @@ export function EventModal({
       <EventDetailModal
         event={selectedEvent}
         onClose={() => setSelectedEvent(null)}
+        onDelete={() => onDelete(selectedEvent)}
       />
     </>
   );

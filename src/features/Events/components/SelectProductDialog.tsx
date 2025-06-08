@@ -23,7 +23,7 @@ import { SelectProductVariantDialog } from './SelectProductVariantDialog';
 interface SelectProductDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onSelect: (product: Product, variant: ProductVariant) => void;
+  onSelect: (product: Product, variant: ProductVariant, returnDate: Date | null) => void;
 }
 
 export function SelectProductDialog({
@@ -64,9 +64,9 @@ export function SelectProductDialog({
     setShowVariantDialog(true);
   };
 
-  const handleVariantSelect = (variant: ProductVariant) => {
+  const handleVariantSelect = (variant: ProductVariant, returnDate: Date | null) => {
     if (selectedProduct) {
-      onSelect(selectedProduct, variant);
+      onSelect(selectedProduct, variant, returnDate);
       setSelectedProduct(null);
       setShowVariantDialog(false);
       onOpenChange(false);

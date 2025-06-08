@@ -10,16 +10,8 @@ import { EventDetailModal } from "./EventDetailModal";
 import { EventFilter, EventFilters } from "./EventFilter";
 import { EventStatus } from "@/shared/types/events";
 import { Skeleton } from "@/shared/components/ui/skeleton";
-
-const getEventTypeClass = (event: CalendarEvent) => {
-  const { sub_type_id } = event;
-  if (sub_type_id === 10) {
-    return "bg-rose-100 text-rose-800";
-  } else if (sub_type_id === 6) {
-    return "bg-red-200 text-red-900";
-  }
-  return 'bg-orange-100 text-orange-800';
-};
+import { getEventTypeClass } from "@/shared/utils/eventUtils";
+import { eventAPI } from "@/entities/Event/eventAPI";
 
 export function EventsList() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -52,7 +44,7 @@ export function EventsList() {
     }
   };
 
-  const { data: backendEvents = [], isLoading, error } = useEvents({
+  const { data: backendEvents = [], isLoading, error, refetch: refetchEvents } = useEvents({
     scheduled_at_start: startOfMonth(currentDate).toISOString(),
     scheduled_at_end: endOfMonth(currentDate).toISOString(),
     search: filters.search || undefined,
@@ -79,8 +71,10 @@ export function EventsList() {
     type: 'default',
     userFullName: event.userFullName,
     subTypeName: event.subTypeName,
+    mainTypeName: event.mainTypeName,
     companyName: event.companyName,
-    sub_type_id: event.sub_type_id
+    sub_type_id: event.sub_type_id,
+    main_type_id: event.main_type_id
   }));
 
   // Combine local and backend events
@@ -107,6 +101,17 @@ export function EventsList() {
 
   // Sort dates in descending order (newest first)
   const sortedDates = Object.keys(groupedEvents).sort((a, b) => b.localeCompare(a));
+
+  const onDeleteEvent = async () => {
+    try {
+      await eventAPI.deleteEvent(selectedEvent?.id || '');
+    } catch (error) {
+      console.error("Error deleting event:", error);
+    } finally {
+      setSelectedEvent(null);
+      refetchEvents();
+    }
+  };
 
   return (
     <>
@@ -202,7 +207,7 @@ export function EventsList() {
                     >
                       <div className="flex items-center justify-between mb-3">
                         <div className="px-2.5 py-1 rounded-full text-xs font-medium bg-white/50">
-                          {event.subTypeName || "default"}
+                          {event.subTypeName || event.mainTypeName}
                         </div>
                       </div>
                       <div className="space-y-2 text-sm text-muted-foreground">
@@ -225,6 +230,7 @@ export function EventsList() {
       </div>
       <EventDetailModal
         event={selectedEvent}
+        onDelete={onDeleteEvent}
         onClose={() => setSelectedEvent(null)}
       />
     </>

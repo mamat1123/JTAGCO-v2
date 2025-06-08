@@ -92,12 +92,11 @@ const data = {
       title: "Admin",
       url: "#",
       icon: ShieldUser,
-      isActive: false,
+      isActive: true,
       items: [
         {
           title: "อนุมัติเบิกสินค้า",
-          url: "#",
-          disabled: true,
+          url: "/admin/shoe-requests",
         },
         {
           title: "สร้างใบเสนอราคา",

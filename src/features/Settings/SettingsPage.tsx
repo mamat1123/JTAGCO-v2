@@ -1,10 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useProfile } from '@/features/Profile/hooks/useProfile';
+import { UserRole } from '@/shared/types/roles';
 
 const SettingsPage: React.FC = () => {
   const { profile } = useProfile();
-  const isSuperAdmin = profile?.role === 'super admin';
+  const isSuperAdmin = profile?.role === UserRole.SUPER_ADMIN;
   console.log(profile);
 
   return (

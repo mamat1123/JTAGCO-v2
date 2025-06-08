@@ -8,6 +8,8 @@ import { Skeleton } from "@/shared/components/ui/skeleton";
 import { startOfMonth, endOfMonth } from "date-fns";
 import { EventModal } from "./EventModal";
 import { EventFilter } from "./EventFilter";
+import { getEventTypeClass } from "@/shared/utils/eventUtils";
+import { eventAPI } from "@/entities/Event/eventAPI";
 
 const WEEK_DAYS = [
   { key: 'sun', label: 'S' },
@@ -18,16 +20,6 @@ const WEEK_DAYS = [
   { key: 'fri', label: 'F' },
   { key: 'sat', label: 'S' }
 ] as const;
-
-const getEventTypeClass = (event: CalendarEvent) => {
-  const {sub_type_id } = event;
-  if (sub_type_id === 10) {
-    return "bg-rose-100 text-rose-800";
-  } else if (sub_type_id === 6) {
-    return "bg-red-200 text-red-900";
-  }
-  return 'bg-orange-100 text-orange-800';
-};
 
 const DayCell: React.FC<{
   day: number;
@@ -68,7 +60,7 @@ const DayCell: React.FC<{
                       {event.userFullName || 'Anonymous'}
                     </div>
                     <div className="font-semibold text-primary truncate">
-                      {event.subTypeName}
+                      {event.subTypeName || event.mainTypeName}
                     </div>
                     <div className="text-muted-foreground truncate">
                       {event.companyName}
@@ -108,7 +100,7 @@ export function Calendar({ className }: Omit<CalendarProps, "events">) {
   const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth();
 
-  const { data: backendEvents = [], isLoading } = useEvents({
+  const { data: backendEvents = [], isLoading, refetch: refetchEvents } = useEvents({
     scheduled_at_start: startOfMonth(currentDate).toISOString(),
     scheduled_at_end: endOfMonth(currentDate).toISOString(),
     search: filters.search || undefined,
@@ -130,6 +122,7 @@ export function Calendar({ className }: Omit<CalendarProps, "events">) {
       description: event.description,
       company_id: event.company_id,
       subTypeName: event.subTypeName,
+      mainTypeName: event.mainTypeName,
       companyName: event.companyName,
       userFullName: event.userFullName,
       main_type_id: event.main_type_id,
@@ -174,6 +167,17 @@ export function Calendar({ className }: Omit<CalendarProps, "events">) {
       />
     );
   }, [getEventsForDay, isLoading, handleDateClick]);
+
+  const onDeleteEvent = async (event: CalendarEvent | null) => {
+    if (!event) return;
+    try {
+      await eventAPI.deleteEvent(event.id);
+    } catch (error) {
+      console.error("Error deleting event:", error);
+    } finally {
+      refetchEvents();
+    }
+  };
 
   return (
     <div className={cn("w-full", className)}>
@@ -235,6 +239,7 @@ export function Calendar({ className }: Omit<CalendarProps, "events">) {
         selectedEvents={selectedEvents}
         onClose={() => setSelectedDate(null)}
         getEventTypeClass={getEventTypeClass}
+        onDelete={onDeleteEvent}
       />
     </div>
   );

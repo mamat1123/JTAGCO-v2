@@ -37,6 +37,7 @@ interface SelectedProduct {
     price: number;
     stock: number;
   };
+  return_date: Date | null;
 }
 
 export function CreateEventPage() {
@@ -112,10 +113,10 @@ export function CreateEventPage() {
           .filter(p => p.variant?.id)
           .map(p => ({
             variant_id: p.variant!.id,
-            quantity: p.quantity
+            quantity: p.quantity,
+            return_date: p.return_date ? p.return_date.toISOString() : null
           })),
       }
-      
       await createEvent.mutateAsync(body);
       toast.success("สร้างกิจกรรมสำเร็จ");
       navigate(`/companies/${companyId}`);
@@ -134,7 +135,7 @@ export function CreateEventPage() {
     setIsProductDialogOpen(true);
   };
 
-  const handleProductSelect = (product: Product, variant: ProductVariant) => {
+  const handleProductSelect = (product: Product, variant: ProductVariant, returnDate: Date | null) => {
     setSelectedProducts([
       ...selectedProducts,
       {
@@ -148,6 +149,7 @@ export function CreateEventPage() {
           price: variant.price,
           stock: variant.stock,
         },
+        return_date: returnDate,
       },
     ]);
   };

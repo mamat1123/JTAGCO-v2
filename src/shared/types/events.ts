@@ -19,6 +19,7 @@ export interface BackendEvent {
   companyName: string;
   userFullName: string;
   subTypeName: string;
+  mainTypeName: string;
 }
 
 export interface CalendarEvent {
@@ -33,6 +34,7 @@ export interface CalendarEvent {
   companyName?: string;
   userFullName?: string;
   subTypeName?: string;
+  mainTypeName?: string;
   status?: EventStatus;
   scheduled_at?: string;
   scheduled_at_start?: string;
@@ -89,4 +91,11 @@ export interface EventMainType {
   id: number;
   code: string;
   name: string;
+}
+
+export interface EventSubType {
+  id: number;
+  code: string;
+  name: string;
+  main_type_id: number;
 }

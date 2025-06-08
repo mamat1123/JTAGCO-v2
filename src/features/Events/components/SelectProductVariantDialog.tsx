@@ -19,11 +19,27 @@ import { productAPI } from '@/entities/Product/productAPI';
 import { ProductVariant } from '@/entities/Product/product';
 import { toast } from 'sonner';
 import { Badge } from '@/shared/components/ui/badge';
+import { Calendar } from '@/shared/components/ui/calendar';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/shared/components/ui/popover';
+import { CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import { th } from 'date-fns/locale';
+import { cn } from '@/shared/lib/utils';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/shared/components/ui/tooltip";
 
 interface SelectProductVariantDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onSelect: (variant: ProductVariant) => void;
+  onSelect: (variant: ProductVariant, returnDate: Date | null) => void;
   productId: string;
 }
 
@@ -36,6 +52,7 @@ export function SelectProductVariantDialog({
   const [variants, setVariants] = useState<ProductVariant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedReturnDate, setSelectedReturnDate] = useState<Date | null>(null);
 
   useEffect(() => {
     const fetchVariants = async () => {
@@ -58,6 +75,12 @@ export function SelectProductVariantDialog({
   const filteredVariants = variants.filter((variant) =>
     variant.sku.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  useEffect(() => {
+    if (!isOpen) {
+      setSelectedReturnDate(null);
+    }
+  }, [isOpen]);
 
   const formatAttributes = (attributes: Record<string, any>) => {
     return Object.entries(attributes).map(([key, value]) => {
@@ -90,13 +113,40 @@ export function SelectProductVariantDialog({
         </DialogHeader>
 
         <div className="space-y-4 flex-1 flex flex-col overflow-hidden">
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 flex flex-col sm:flex-row gap-4">
             <Input
               placeholder="ค้นหาตัวเลือกสินค้า..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full"
             />
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full sm:w-[240px] justify-start text-left font-normal",
+                    !selectedReturnDate && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {selectedReturnDate ? (
+                    format(selectedReturnDate, "PPP", { locale: th })
+                  ) : (
+                    <span>เลือกวันที่คืน</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={selectedReturnDate || undefined}
+                  onSelect={(date) => setSelectedReturnDate(date || null)}
+                  initialFocus
+                  locale={th}
+                />
+              </PopoverContent>
+            </Popover>
           </div>
 
           <div className="border rounded-md flex-1 overflow-auto">
@@ -127,7 +177,23 @@ export function SelectProductVariantDialog({
                       </TableRow>
                     ) : (
                       filteredVariants.map((variant) => (
-                        <TableRow key={variant.id}>
+                        <TableRow 
+                          key={variant.id}
+                          className={cn(
+                            "cursor-pointer hover:bg-muted/50",
+                            !selectedReturnDate && "hover:bg-destructive/10"
+                          )}
+                          onClick={() => {
+                            if (!selectedReturnDate) {
+                              toast.error('กรุณาเลือกวันที่คืนก่อนเลือกตัวเลือกสินค้า', {
+                                duration: 3000,
+                              });
+                              return;
+                            }
+                            onSelect(variant, selectedReturnDate);
+                            onOpenChange(false);
+                          }}
+                        >
                           <TableCell className="whitespace-nowrap">{variant.sku}</TableCell>
                           <TableCell>
                             <div className="max-h-[200px] overflow-y-auto pr-2">
@@ -139,17 +205,27 @@ export function SelectProductVariantDialog({
                           <TableCell className="whitespace-nowrap">{variant.price.toLocaleString()} บาท</TableCell>
                           <TableCell className="whitespace-nowrap">{variant.stock}</TableCell>
                           <TableCell>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
-                                onSelect(variant);
-                                onOpenChange(false);
-                              }}
-                              className="w-full"
-                            >
-                              เลือก
-                            </Button>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className={cn(
+                                      "w-full",
+                                      !selectedReturnDate && "text-destructive hover:text-destructive"
+                                    )}
+                                  >
+                                    เลือก
+                                  </Button>
+                                </TooltipTrigger>
+                                {!selectedReturnDate && (
+                                  <TooltipContent>
+                                    <p>กรุณาเลือกวันที่คืนก่อน</p>
+                                  </TooltipContent>
+                                )}
+                              </Tooltip>
+                            </TooltipProvider>
                           </TableCell>
                         </TableRow>
                       ))

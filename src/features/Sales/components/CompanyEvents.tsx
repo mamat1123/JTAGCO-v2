@@ -22,20 +22,35 @@ export function CompanyEvents({ companyId }: CompanyEventsProps) {
   const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
 
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const data = await eventAPI.getEvents({ company_id: companyId });
-        setEvents(data);
-      } catch (error) {
-        console.error('Error fetching events:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchEvents = async () => {
+    try {
+      const data = await eventAPI.getEvents({ company_id: companyId });
+      setEvents(data);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchEvents();
   }, [companyId]);
+
+  useEffect(() => {
+    console.log("selectedEvent", selectedEvent);
+  }, [selectedEvent]);
+
+  const onDeleteEvent = async () => {
+    try {
+      await eventAPI.deleteEvent(selectedEvent?.id || '');
+    } catch (error) {
+      console.error("Error deleting event:", error);
+    } finally {
+      fetchEvents();
+      setSelectedEvent(null);
+    }
+  };
 
   const handleEventClick = (event: Event) => {
     // Convert Event to CalendarEvent format
@@ -50,7 +65,7 @@ export function CompanyEvents({ companyId }: CompanyEventsProps) {
       status: event.status,
       main_type_id: event.main_type_id,
       sub_type_id: event.sub_type_id,
-      userId: event.user_id,
+      user_id: event.user_id,
       eventCheckins: [],
       eventImages: []
     };
@@ -96,11 +111,10 @@ export function CompanyEvents({ companyId }: CompanyEventsProps) {
                       {format(new Date(event.scheduled_at), 'HH:mm', { locale: th })}
                     </p>
                   </div>
-                  <span className={`px-2 py-1 rounded-full text-xs ${
-                    event.status === 'completed' 
+                  <span className={`px-2 py-1 rounded-full text-xs ${event.status === 'completed'
                       ? 'bg-green-100 text-green-800'
                       : 'bg-yellow-100 text-yellow-800'
-                  }`}>
+                    }`}>
                     {event.status === 'completed' ? 'เข็คอินแล้ว' : 'ไม่ได้เข็คอิน'}
                   </span>
                 </div>
@@ -118,9 +132,10 @@ export function CompanyEvents({ companyId }: CompanyEventsProps) {
           </div>
         </CardContent>
       </Card>
-      <EventDetailModal 
-        event={selectedEvent} 
-        onClose={() => setSelectedEvent(null)} 
+      <EventDetailModal
+        event={selectedEvent}
+        onDelete={onDeleteEvent}
+        onClose={() => { }}
       />
     </>
   );
