@@ -135,7 +135,7 @@ export function CompanyEvents({ companyId }: CompanyEventsProps) {
       <EventDetailModal
         event={selectedEvent}
         onDelete={onDeleteEvent}
-        onClose={() => { }}
+        onClose={() => setSelectedEvent(null)}
       />
     </>
   );

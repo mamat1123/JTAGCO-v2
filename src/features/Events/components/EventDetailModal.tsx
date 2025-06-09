@@ -135,6 +135,7 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
 
     // Super admin can always check in
     if (profile.role === UserRole.SUPER_ADMIN) return true;
+    if (profile.role === UserRole.MANAGER) return true;
 
     // Sales can only check in their own events
     if (profile.role === UserRole.SALES) {
