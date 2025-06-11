@@ -3,6 +3,7 @@
 import { Button } from "@/shared/components/ui/button"
 import { Card, CardContent } from "@/shared/components/ui/card"
 import { Badge } from "@/shared/components/ui/badge"
+import { formatThaiDate } from "@/shared/utils/dateUtils"
 import {
   Eye,
   Loader2,
@@ -83,15 +84,6 @@ export const RequestList = ({
     )
   }
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString("th-TH", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })
-  }
-
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -151,7 +143,7 @@ export const RequestList = ({
                       <span className="hidden sm:inline">•</span>
                       <span>สี{request.attributes.color}</span>
                       <span className="hidden sm:inline">•</span>
-                      <span>{formatDate(request.scheduledAt)}</span>
+                      <span>{formatThaiDate(request.scheduledAt)}</span>
                     </div>
                   </div>
                 </div>

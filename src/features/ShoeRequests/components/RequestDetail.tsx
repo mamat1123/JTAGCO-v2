@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avat
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/shared/components/ui/dialog"
 import { Check, X, Calendar, Package, MessageSquare, Clock, Hash, Palette, Shield, User } from "lucide-react"
 import { ShoeRequest } from "@/entities/ShoeRequest/types"
+import { formatThaiDate } from "@/shared/utils/dateUtils"
 
 export const RequestDetail = ({
   request,
@@ -70,15 +71,6 @@ export const RequestDetail = ({
         แผ่นรองใน
       </Badge>
     )
-  }
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString("th-TH", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })
   }
 
   return (
@@ -188,7 +180,7 @@ export const RequestDetail = ({
                     <Calendar className="h-4 w-4 text-gray-500 flex-shrink-0" />
                     <div>
                       <p className="text-sm font-medium">วันที่ใช้งาน</p>
-                      <p className="text-sm text-gray-600">{formatDate(request.scheduledAt)}</p>
+                      <p className="text-sm text-gray-600">{formatThaiDate(request.scheduledAt)}</p>
                     </div>
                   </div>
 
@@ -196,7 +188,7 @@ export const RequestDetail = ({
                     <Clock className="h-4 w-4 text-gray-500 flex-shrink-0" />
                     <div>
                       <p className="text-sm font-medium">วันที่คืน</p>
-                      <p className="text-sm text-gray-600">{formatDate(request.return_date)}</p>
+                      <p className="text-sm text-gray-600">{formatThaiDate(request.return_date)}</p>
                     </div>
                   </div>
                 </div>

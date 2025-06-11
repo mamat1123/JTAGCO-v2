@@ -67,4 +67,19 @@ export const useEventDetail = (eventId: string | null) => {
     },
     enabled: !!eventId,
   });
+};
+
+export const useReceiveShoeVariants = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (eventId: string) => {
+      const { data } = await api.patch<CalendarEvent>(`${EVENTS_ENDPOINT}/${eventId}/receive-shoe-variants`);
+      return data;
+    },
+    onSuccess: (_, eventId) => {
+      queryClient.invalidateQueries({ queryKey: ["event", eventId] });
+      queryClient.invalidateQueries({ queryKey: ["event-timeline", eventId] });
+    },
+  });
 }; 
