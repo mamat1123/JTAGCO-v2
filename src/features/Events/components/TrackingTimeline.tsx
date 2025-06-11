@@ -23,7 +23,7 @@ export function TrackingTimeline({ steps, onReceiveProduct }: TrackingTimelinePr
       <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200" />
 
       <div className="space-y-6">
-        {steps.map((step, index) => (
+        {steps.map((step, _) => (
           <div key={step.id} className="relative flex gap-4">
             {/* Icon */}
             <div
