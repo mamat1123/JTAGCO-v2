@@ -16,6 +16,7 @@ import { CreateEventPage } from '@/features/Events/pages/CreateEventPage';
 import { ApproveUserPage } from '@/features/Settings/Users/ApproveUserPage';
 import { ShoeRequestsPage } from '@/features/ShoeRequests/ShoeRequestsPage';
 import { AdminRoute } from '@/features/Auth/AdminRoute';
+import { InactiveCompaniesPage } from '@/features/InactiveCompanies/InactiveCompaniesPage';
 
 export const router = createBrowserRouter([
   {
@@ -63,14 +64,6 @@ export const router = createBrowserRouter([
         element: <EditCompany />
       },
       {
-        path: '/billing',
-        element: <div>Billing Information</div>,
-      },
-      {
-        path: '/help',
-        element: <div>Help & Support</div>,
-      },
-      {
         path: '/events',
         element: <EventsPage />,
       },
@@ -85,6 +78,20 @@ export const router = createBrowserRouter([
             <ShoeRequestsPage />
           </AdminRoute>
         ),
+      },
+    ],
+  },
+  {
+    path: "/notifications",
+    element: (
+      <ProtectedRoute>
+        <DashboardLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        path: "inactive-companies",
+        element: <InactiveCompaniesPage />,
       },
     ],
   },

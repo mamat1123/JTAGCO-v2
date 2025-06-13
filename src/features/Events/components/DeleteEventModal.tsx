@@ -13,7 +13,7 @@ import { useState } from "react";
 interface DeleteEventModalProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onDelete: () => void;
+  onDelete: () => Promise<void>;
 }
 
 export function DeleteEventModal({
@@ -22,18 +22,25 @@ export function DeleteEventModal({
   onDelete,
 }: DeleteEventModalProps) {
   const [isDeleting, setIsDeleting] = useState(false);
+
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      onDelete();
+      await onDelete();
+      onOpenChange(false);
     } catch (error) {
+      console.error("Error deleting event:", error);
     } finally {
       setIsDeleting(false);
     }
   };
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
+    <AlertDialog open={isOpen} onOpenChange={(open) => {
+      if (!open && !isDeleting) {
+        onOpenChange(false);
+      }
+    }}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>ยืนยันการลบกิจกรรม</AlertDialogTitle>

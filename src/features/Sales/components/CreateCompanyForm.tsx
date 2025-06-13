@@ -21,6 +21,7 @@ export function CreateCompanyForm({ onSubmit }: CreateCompanyFormProps) {
     email: "",
     credit: 0,
     tax_id: "",
+    order_cycle: 0,
     branch: "",
     business_type_id: undefined,
   });
@@ -45,8 +46,13 @@ export function CreateCompanyForm({ onSubmit }: CreateCompanyFormProps) {
     try {
       // Convert credit to number and validate
       const credit = Number(formData.credit);
+      const order_cycle = Number(formData.order_cycle);
       if (isNaN(credit)) {
         toast.error("กรุณากรอกเครดิตเป็นตัวเลข");
+        return;
+      }
+      if (isNaN(order_cycle)) {
+        toast.error("กรุณากรอกรอบการจัดส่งเป็นตัวเลข");
         return;
       }
 
@@ -54,6 +60,7 @@ export function CreateCompanyForm({ onSubmit }: CreateCompanyFormProps) {
       const submitData = {
         ...formData,
         credit,
+        order_cycle,
         business_type_id: formData.business_type_id || 0
       };
 
@@ -102,6 +109,7 @@ export function CreateCompanyForm({ onSubmit }: CreateCompanyFormProps) {
               branch={formData.branch}
               email={formData.email}
               credit={formData.credit}
+              order_cycle={formData.order_cycle || 0}
               businessTypes={businessTypes}
               onChange={handleChange}
               onBusinessTypeChange={handleBusinessTypeChange}

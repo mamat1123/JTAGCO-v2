@@ -51,7 +51,7 @@ interface EventCheckin {
 interface EventDetailModalProps {
   event: CalendarEvent | null;
   onClose: () => void;
-  onDelete: () => void;
+  onDelete: () => Promise<void>;
 }
 
 export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalProps) {
@@ -187,7 +187,11 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
 
   return (
     <>
-      <Dialog open={!!event} onOpenChange={onClose}>
+      <Dialog open={!!event} onOpenChange={(open) => {
+        if (!open && !showDeleteModal) {
+          onClose();
+        }
+      }}>
         <DialogContent className="!max-w-4xl w-[95vw] max-h-[90vh] p-0 overflow-hidden flex flex-col">
           <div className="flex flex-col h-full max-h-[90vh]">
             {/* Header */}

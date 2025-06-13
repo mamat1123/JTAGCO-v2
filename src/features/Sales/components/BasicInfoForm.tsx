@@ -15,6 +15,7 @@ interface BasicInfoFormProps {
   business_type_id?: number;
   business_type_detail?: string;
   branch: string;
+  order_cycle: number;
   email?: string;
   credit: number;
   businessTypes: BusinessTypeDto[];
@@ -29,6 +30,7 @@ export function BasicInfoForm({
   business_type_id,
   business_type_detail,
   branch,
+  order_cycle,
   email,
   credit,
   businessTypes,
@@ -129,6 +131,19 @@ export function BasicInfoForm({
             onChange={onChange}
             required
             placeholder="กรอกเครดิต"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="credit">รอบการจัดส่ง</Label>
+          <Input
+            id="order_cycle"
+            name="order_cycle"
+            type="number"
+            value={order_cycle}
+            onChange={onChange}
+            required
+            placeholder="กรอกรอบการจัดส่ง"
           />
         </div>
       </div>

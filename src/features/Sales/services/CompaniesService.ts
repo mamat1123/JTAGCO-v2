@@ -19,6 +19,10 @@ export class CompaniesService {
     return companyAPI.updateCompany(id, company);
   }
 
+  static async transferCompany(id: string, userId: string): Promise<Company> {
+    return companyAPI.transferCompany(id, userId);
+  }
+
   static async deleteCompany(id: string): Promise<void> {
     return companyAPI.deleteCompany(id);
   }

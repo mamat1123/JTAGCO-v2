@@ -5,6 +5,16 @@ export interface Position {
   lng: string | null;
 }
 
+export interface InactiveCompany {
+  id: number;
+  name: string;
+  lastEventUpdatedAt: string | null;
+  province: string;
+  branch: string;
+  totalEmployees: number;
+  credit: number;
+}
+
 export interface Company {
   id: string;
   created_at: string;
@@ -43,6 +53,7 @@ export interface CreateCompanyDTO {
   branch: string;
   business_type_id?: number;
   user_id?: string;
+  order_cycle?: number;
 }
 
 export interface UpdateCompanyDTO {
@@ -82,4 +93,51 @@ export interface CompanyFilters {
   province?: string;
   email?: string;
   user_id?: string;
-} 
+}
+
+export interface InactiveCompaniesDto {
+  page?: number;
+  limit?: number;
+  months?: number;
+  sortBy?: 'last_event_updated_at' | 'credit' | 'total_employees';
+  sortOrder?: 'asc' | 'desc';
+  search?: string;
+  province?: string;
+  branch?: string;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface InactiveCompanyStats {
+  total_companies: number;
+  total_employees: number;
+  avg_credit: number;
+  never_updated: number;
+  by_province: {
+    province: string;
+    count: number;
+  }[];
+  by_branch: {
+    branch: string;
+    count: number;
+  }[];
+  credit_distribution: {
+    range: string;
+    count: number;
+  }[];
+}
+
+export interface CompanyDto {
+  id: string;
+  name: string;
+  branch: string | null;
+  email: string | null;
+  user_id: string;
+  created_at: string;
+  updated_at: string;
+}

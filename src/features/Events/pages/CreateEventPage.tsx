@@ -127,8 +127,9 @@ export function CreateEventPage() {
   };
 
   const showProductSelection = React.useMemo(() => {
-    const productSubTypes = ["1", "5", "7", "8", "9"];
-    return productSubTypes.includes(formData.sub_type_id);
+    return true;
+    // const productSubTypes = ["1", "5", "7", "8", "9"];
+    // return productSubTypes.includes(formData.sub_type_id);
   }, [formData.sub_type_id]);
 
   const handleAddProduct = () => {

@@ -159,6 +159,7 @@ export function EditCompany() {
                 branch={company.branch || ''}
                 email={company.email || ''}
                 credit={company.credit || 0}
+                order_cycle={company.order_cycle || 0}
                 businessTypes={businessTypes}
                 onChange={handleBasicInfoChange}
                 onBusinessTypeChange={handleBusinessTypeChange}

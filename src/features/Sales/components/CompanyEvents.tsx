@@ -42,17 +42,28 @@ export function CompanyEvents({ companyId }: CompanyEventsProps) {
   }, [selectedEvent]);
 
   const onDeleteEvent = async () => {
+    if (!selectedEvent?.id) {
+      console.warn("Cannot delete event: No event selected or missing event ID");
+      return;
+    }
+
+    const eventId = selectedEvent.id;
     try {
-      await eventAPI.deleteEvent(selectedEvent?.id || '');
+      await eventAPI.deleteEvent(eventId);
+      await fetchEvents(); // Refresh the events list
+      setSelectedEvent(null); // Only close after successful deletion
     } catch (error) {
       console.error("Error deleting event:", error);
-    } finally {
-      fetchEvents();
-      setSelectedEvent(null);
+      // You might want to show a toast notification here
     }
   };
 
   const handleEventClick = (event: Event) => {
+    if (!event) {
+      console.warn("Cannot handle event click: Event is null or undefined");
+      return;
+    }
+
     // Convert Event to CalendarEvent format
     const calendarEvent: CalendarEvent = {
       id: event.id,
@@ -70,6 +81,13 @@ export function CompanyEvents({ companyId }: CompanyEventsProps) {
       eventImages: []
     };
     setSelectedEvent(calendarEvent);
+  };
+
+  const onClose = () => {
+    if (selectedEvent) {
+      console.log("Closing event details for:", selectedEvent.id);
+    }
+    setSelectedEvent(null);
   };
 
   if (loading) {
@@ -135,7 +153,7 @@ export function CompanyEvents({ companyId }: CompanyEventsProps) {
       <EventDetailModal
         event={selectedEvent}
         onDelete={onDeleteEvent}
-        onClose={() => setSelectedEvent(null)}
+        onClose={onClose}
       />
     </>
   );

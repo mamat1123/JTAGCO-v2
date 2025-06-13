@@ -26,6 +26,10 @@ import {
 import { toast } from "sonner";
 import { PlusCircle } from "lucide-react";
 import { UserRole } from "@/shared/types/roles";
+import { CompanyTransferModal } from "@/features/Sales/components/CompanyTransferModal";
+import { CompanyDto } from "@/entities/Company/company";
+import { Profiles } from "@/entities/Profile/profile";
+import { profileService } from "@/features/Profile/services/profileService";
 
 export function CompanyDetails() {
   const { id } = useParams<{ id: string }>();
@@ -34,16 +38,22 @@ export function CompanyDetails() {
   const { profile } = useProfile();
   const [businessTypes, setBusinessTypes] = useState<BusinessTypeDto[]>([]);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isTransferDialogOpen, setIsTransferDialogOpen] = useState(false);
+  const [profiles, setProfiles] = useState<Profiles>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       if (id) {
         await fetchCompany(id);
         try {
-          const types = await BusinessTypeService.getAll();
+          const [types, profilesList] = await Promise.all([
+            BusinessTypeService.getAll(),
+            profileService.getProfile()
+          ]);
           setBusinessTypes(types);
+          setProfiles(profilesList);
         } catch (error) {
-          console.error('Error fetching business types:', error);
+          console.error('Error fetching data:', error);
         }
       }
     };
@@ -120,6 +130,13 @@ export function CompanyDetails() {
                   className="w-full sm:w-auto"
                 >
                   แก้ไขข้อมูล
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => setIsTransferDialogOpen(true)}
+                  className="w-full sm:w-auto"
+                >
+                  โอน
                 </Button>
                 <Button
                   variant="destructive"
@@ -292,6 +309,14 @@ export function CompanyDetails() {
       </div>
 
       <CustomerPage />
+      <CompanyTransferModal
+        open={isTransferDialogOpen}
+        onClose={() => setIsTransferDialogOpen(false)}
+        onOpenChange={setIsTransferDialogOpen}
+        company={currentCompany as CompanyDto}
+        profiles={profiles}
+        onSuccess={() => fetchCompany(id!)}
+      />
     </div>
   );
 } 

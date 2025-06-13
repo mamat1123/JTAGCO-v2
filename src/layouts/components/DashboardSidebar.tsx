@@ -38,21 +38,6 @@ const data = {
       title: "Dashboard",
       url: "/dashboard",
       icon: ChartPie,
-      // isActive: true,
-      // items: [
-      //   {
-      //     title: "History",
-      //     url: "#",
-      //   },
-      //   {
-      //     title: "Starred",
-      //     url: "#",
-      //   },
-      //   {
-      //     title: "Settings",
-      //     url: "#",
-      //   },
-      // ],
     },
     {
       title: "Sale",
@@ -79,12 +64,11 @@ const data = {
       title: "Notification",
       url: "#",
       icon: Bell,
-      isActive: false,
+      isActive: true,
       items: [
         {
-          disabled: true,
-          title: "รอบการสั้งซื้อ",
-          url: "#",
+          title: "ติดตามลูกค้า",
+          url: "/notifications/inactive-companies",
         },
       ],
     },
@@ -109,17 +93,6 @@ const data = {
       title: "Central",
       url: "#",
       icon: UserRound,
-      // isActive: true,
-      // items: [
-      //   {
-      //     title: "อนุมัติเบิกสินค้า",
-      //     url: "#",
-      //   },
-      //   {
-      //     title: "สร้างใบเสนอราคา",
-      //     url: "#",
-      //   },
-      // ],
     },
   ],
   navSecondary: [

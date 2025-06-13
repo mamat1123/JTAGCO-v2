@@ -15,7 +15,7 @@ interface EventModalProps {
   selectedEvents: CalendarEvent[];
   onClose: () => void;
   getEventTypeClass: (event: CalendarEvent) => string;
-  onDelete: (event: CalendarEvent | null) => void;
+  onDelete: (event: CalendarEvent | null) => Promise<void>;
 }
 
 export function EventModal({
@@ -54,6 +54,15 @@ export function EventModal({
   const displayEvents = selectedUserId === 'all'
     ? selectedEvents
     : groupedEvents[selectedUserId]?.events || [];
+
+  const handleDelete = async () => {
+    if (!selectedEvent) {
+      throw new Error("No event selected");
+    }
+    await onDelete(selectedEvent);
+    setSelectedEvent(null);
+    handleClose();
+  };
 
   return (
     <>
@@ -149,7 +158,7 @@ export function EventModal({
       <EventDetailModal
         event={selectedEvent}
         onClose={() => setSelectedEvent(null)}
-        onDelete={() => onDelete(selectedEvent)}
+        onDelete={handleDelete}
       />
     </>
   );

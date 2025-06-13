@@ -103,14 +103,12 @@ export function EventsList() {
   const sortedDates = Object.keys(groupedEvents).sort((a, b) => b.localeCompare(a));
 
   const onDeleteEvent = async () => {
-    try {
-      await eventAPI.deleteEvent(selectedEvent?.id || '');
-    } catch (error) {
-      console.error("Error deleting event:", error);
-    } finally {
-      setSelectedEvent(null);
-      refetchEvents();
+    if (!selectedEvent?.id) {
+      throw new Error("No event selected");
     }
+    await eventAPI.deleteEvent(selectedEvent.id);
+    await refetchEvents();
+    setSelectedEvent(null);
   };
 
   return (
