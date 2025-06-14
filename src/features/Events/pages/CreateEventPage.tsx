@@ -104,17 +104,25 @@ export function CreateEventPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Adjust all dates to keep them in the same day in UTC
+      const adjustDate = (date: Date | null) => {
+        if (!date) return "";
+        const adjusted = new Date(date);
+        adjusted.setHours(adjusted.getHours() + 7);
+        return adjusted.toISOString();
+      };
+
       const body = {
         ...formData,
-        scheduled_at: formData.scheduled_at.toISOString(),
-        test_start_at: formData.test_start_at ? formData.test_start_at.toISOString() : "",
-        test_end_at: formData.test_end_at ? formData.test_end_at.toISOString() : "",
+        scheduled_at: adjustDate(formData.scheduled_at),
+        test_start_at: adjustDate(formData.test_start_at),
+        test_end_at: adjustDate(formData.test_end_at),
         products: selectedProducts
           .filter(p => p.variant?.id)
           .map(p => ({
             variant_id: p.variant!.id,
             quantity: p.quantity,
-            return_date: p.return_date ? p.return_date.toISOString() : null
+            return_date: p.return_date ? adjustDate(p.return_date) : null
           })),
       }
       await createEvent.mutateAsync(body);
@@ -305,8 +313,8 @@ export function CreateEventPage() {
           >
             ยกเลิก
           </Button>
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             className="w-full sm:w-auto"
             disabled={createEvent.isPending}
           >
