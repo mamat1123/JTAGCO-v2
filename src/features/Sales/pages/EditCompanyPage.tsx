@@ -68,7 +68,8 @@ export function EditCompany() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (company?.zip_code && company?.zip_code < 10000) {
+    const zipCode = company.zip_code ?? 0;
+    if (zipCode >= 0 && zipCode < 10000) {
       toast.error('รหัสไปรษณีย์ต้องมี 5 หลัก');
       return;
     }
