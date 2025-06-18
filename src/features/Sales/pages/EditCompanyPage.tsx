@@ -68,14 +68,16 @@ export function EditCompany() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const zipCode = company.zip_code ?? 0;
-    if (zipCode >= 0 && zipCode < 10000) {
-      toast.error('รหัสไปรษณีย์ต้องมี 5 หลัก');
-      return;
-    }
     try {
       if (!id) return;
-      await CompaniesService.updateCompany(id, company);
+      await CompaniesService.updateCompany(id, {
+        ...company,
+        zip_code: company.zip_code ? Number(company.zip_code) : 0,
+        credit: Number(company.credit),
+        order_cycle: Number(company.order_cycle),
+        total_employees: Number(company.total_employees),
+        old_price: Number(company.old_price),
+      });
       toast.success('อัพเดทข้อมูลบริษัทสำเร็จ');
       navigate(`/companies/${id}`);
     } catch (error) {
@@ -88,9 +90,7 @@ export function EditCompany() {
     const { name, value } = e.target;
     setCompany(prev => ({
       ...prev,
-      [name]: name === 'old_price' || name === 'total_employees' || name === 'order_cycle' || name === 'zip_code'
-        ? Number(value) || 0
-        : value
+      [name]: value
     }));
   };
 
@@ -163,8 +163,8 @@ export function EditCompany() {
                 business_type_id={company.business_type_id}
                 branch={company.branch || ''}
                 email={company.email || ''}
-                credit={company.credit || 0}
-                order_cycle={company.order_cycle || 0}
+                credit={company.credit}
+                order_cycle={company.order_cycle}
                 businessTypes={businessTypes}
                 onChange={handleBasicInfoChange}
                 onBusinessTypeChange={handleBusinessTypeChange}

@@ -53,7 +53,7 @@ export interface CreateCompanyDTO {
   branch: string;
   business_type_id?: number;
   user_id?: string;
-  order_cycle?: number;
+  order_cycle: number;
 }
 
 export interface UpdateCompanyDTO {
@@ -70,8 +70,8 @@ export interface UpdateCompanyDTO {
   old_price?: number;
   job_description?: string | null;
   total_employees?: number | null;
-  credit?: number;
-  order_cycle?: number;
+  credit: number;
+  order_cycle: number;
   business_type_detail?: string | null;
   competitor_details?: string | null;
   sub_district?: string | null;

@@ -129,7 +129,6 @@ export function BasicInfoForm({
             type="number"
             value={credit}
             onChange={onChange}
-            required
             placeholder="กรอกเครดิต"
           />
         </div>
@@ -142,7 +141,6 @@ export function BasicInfoForm({
             type="number"
             value={order_cycle}
             onChange={onChange}
-            required
             placeholder="กรอกรอบการจัดส่ง"
           />
         </div>

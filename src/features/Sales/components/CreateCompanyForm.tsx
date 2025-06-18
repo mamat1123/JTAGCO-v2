@@ -20,8 +20,8 @@ export function CreateCompanyForm({ onSubmit }: CreateCompanyFormProps) {
     name: "",
     email: "",
     credit: 0,
-    tax_id: "",
     order_cycle: 0,
+    tax_id: "",
     branch: "",
     business_type_id: undefined,
   });
@@ -109,7 +109,7 @@ export function CreateCompanyForm({ onSubmit }: CreateCompanyFormProps) {
               branch={formData.branch}
               email={formData.email}
               credit={formData.credit}
-              order_cycle={formData.order_cycle || 0}
+              order_cycle={formData.order_cycle}
               businessTypes={businessTypes}
               onChange={handleChange}
               onBusinessTypeChange={handleBusinessTypeChange}
