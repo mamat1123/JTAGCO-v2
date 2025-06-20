@@ -23,6 +23,9 @@ import {
   MapPin,
   ChevronDown,
   ChevronUp,
+  Mail,
+  Phone,
+  Contact,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { useState, useEffect, useMemo } from "react";
@@ -197,7 +200,7 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
             {/* Header */}
             <DialogHeader className="p-4 md:px-6 md:py-4 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
               <div className="flex items-center justify-between">
-                <DialogTitle className="text-lg md:text-2xl font-bold text-gray-900">รายละเอียดกิจกรรม</DialogTitle>
+                <DialogTitle className="text-base md:text-2xl font-bold text-gray-900">รายละเอียดกิจกรรม</DialogTitle>
               </div>
             </DialogHeader>
 
@@ -234,10 +237,10 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
                     <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 py-4">
                       <div className="flex items-start justify-between">
                         <div className="space-y-2">
-                          <CardTitle className="text-2xl text-gray-900">
+                          <CardTitle className="text-lg md:text-2xl text-gray-900">
                             {displayEvent.subTypeName || displayEvent.mainTypeName}
                           </CardTitle>
-                          <Badge variant={isEventPassed ? "destructive" : "default"} className="w-fit">
+                          <Badge variant={isEventPassed ? "destructive" : "default"} className="w-fit text-xs md:text-sm">
                             {isEventPassed ? "กิจกรรมที่ผ่านมาแล้ว" : "กิจกรรมที่กำลังจะมาถึง"}
                           </Badge>
                         </div>
@@ -248,32 +251,67 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
                         <div className="space-y-4">
                           <div className="flex items-center gap-3">
                             <div className="p-2 bg-blue-100 rounded-lg">
-                              <User className="h-5 w-5 text-blue-600" />
+                              <User className="h-4 w-4 md:h-5 md:w-5 text-blue-600" />
                             </div>
                             <div>
-                              <p className="text-sm text-gray-500">ผู้จัด</p>
-                              <p className="font-medium">{displayEvent.userFullName || "Anonymous"}</p>
+                              <p className="text-xs md:text-sm text-gray-500">ผู้จัด</p>
+                              <p className="text-sm md:font-medium">{displayEvent.userFullName || "Anonymous"}</p>
                             </div>
                           </div>
 
                           <div className="flex items-center gap-3">
                             <div className="p-2 bg-green-100 rounded-lg">
-                              <Building2 className="h-5 w-5 text-green-600" />
+                              <Building2 className="h-4 w-4 md:h-5 md:w-5 text-green-600" />
                             </div>
                             <div>
-                              <p className="text-sm text-gray-500">บริษัท</p>
-                              <p className="font-medium">{displayEvent.companyName}</p>
+                              <p className="text-xs md:text-sm text-gray-500">บริษัท</p>
+                              <p className="text-sm md:font-medium">{displayEvent.companyName}</p>
                             </div>
                           </div>
+
+                          {/* Customer Information */}
+                          {displayEvent.customers && (
+                            <>
+                              <div className="flex items-center gap-3">
+                                <div className="p-2 bg-orange-100 rounded-lg">
+                                  <Contact className="h-4 w-4 md:h-5 md:w-5 text-orange-600" />
+                                </div>
+                                <div>
+                                  <p className="text-xs md:text-sm text-gray-500">ผู้ติดต่อ</p>
+                                  <p className="text-sm md:font-medium">{displayEvent.customers.contact_name}</p>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-3">
+                                <div className="p-2 bg-blue-100 rounded-lg">
+                                  <Mail className="h-4 w-4 md:h-5 md:w-5 text-blue-600" />
+                                </div>
+                                <div>
+                                  <p className="text-xs md:text-sm text-gray-500">อีเมล</p>
+                                  <p className="text-sm md:font-medium">{displayEvent.customers.email}</p>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-3">
+                                <div className="p-2 bg-purple-100 rounded-lg">
+                                  <Phone className="h-4 w-4 md:h-5 md:w-5 text-purple-600" />
+                                </div>
+                                <div>
+                                  <p className="text-xs md:text-sm text-gray-500">เบอร์โทรศัพท์</p>
+                                  <p className="text-sm md:font-medium">{displayEvent.customers.phone}</p>
+                                </div>
+                              </div>
+                            </>
+                          )}
 
                           {displayEvent.startTime && displayEvent.endTime && (
                             <div className="flex items-center gap-3">
                               <div className="p-2 bg-purple-100 rounded-lg">
-                                <Clock className="h-5 w-5 text-purple-600" />
+                                <Clock className="h-4 w-4 md:h-5 md:w-5 text-purple-600" />
                               </div>
                               <div>
-                                <p className="text-sm text-gray-500">เวลา</p>
-                                <p className="font-medium">
+                                <p className="text-xs md:text-sm text-gray-500">เวลา</p>
+                                <p className="text-sm md:font-medium">
                                   {displayEvent.startTime} - {displayEvent.endTime}
                                 </p>
                               </div>
@@ -283,9 +321,9 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
 
                         {displayEvent.description && (
                           <div className="space-y-2">
-                            <h4 className="font-semibold text-gray-900">รายละเอียด</h4>
+                            <h4 className="font-semibold text-gray-900 text-sm md:text-base">รายละเอียด</h4>
                             <div className="p-4 bg-gray-50 rounded-lg">
-                              <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+                              <p className="text-gray-700 whitespace-pre-wrap leading-relaxed text-sm md:text-base">
                                 {displayEvent.description}
                               </p>
                             </div>
@@ -299,8 +337,8 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
                   {displayEvent.eventImages && displayEvent.eventImages.length > 0 && (
                     <Card className="overflow-hidden p-2 pt-4 md:p-6 mb-4 flex gap-2ode">
                       <CardHeader className="p-0">
-                        <CardTitle className="flex items-center gap-2">
-                          <Camera className="h-5 w-5" />
+                        <CardTitle className="flex items-center gap-2 text-sm md:text-base">
+                          <Camera className="h-4 w-4 md:h-5 md:w-5" />
                           รูปภาพกิจกรรม
                         </CardTitle>
                       </CardHeader>
@@ -314,8 +352,8 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
                   <Card className="mb-4 py-2 md:py-6">
                     <CardHeader className="p-2 md:p-4">
                       <div className="flex items-center justify-between">
-                        <CardTitle className="flex items-center gap-2">
-                          <CheckCircle2 className="h-5 w-5" />
+                        <CardTitle className="flex items-center gap-2 text-sm md:text-base">
+                          <CheckCircle2 className="h-4 w-4 md:h-5 md:w-5" />
                           จัดการการเช็คอิน
                         </CardTitle>
                         {!showCheckinForm && canCheckin && (
@@ -331,7 +369,7 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
                       {showCheckinForm && canCheckin && (
                         <div className="p-4 border-2 border-dashed border-gray-200 rounded-lg space-y-4">
                           <div className="flex items-center justify-between">
-                            <h4 className="font-medium">เช็คอินใหม่</h4>
+                            <h4 className="font-medium text-sm md:text-base">เช็คอินใหม่</h4>
                             <Button
                               variant="ghost"
                               size="sm"
@@ -347,7 +385,7 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
                           {checkinError && (
                             <div className="flex items-center gap-2 p-3 rounded-lg bg-red-50 text-red-600 border border-red-200">
                               <AlertCircle className="h-4 w-4 flex-shrink-0" />
-                              <p className="text-sm">{checkinError}</p>
+                              <p className="text-xs md:text-sm">{checkinError}</p>
                             </div>
                           )}
 
@@ -382,7 +420,7 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
                           <AlertCircle className="h-5 w-5 flex-shrink-0" />
                           <div>
                             <p className="font-medium">กิจกรรมสิ้นสุดแล้ว</p>
-                            <p className="text-sm">ไม่สามารถเช็คอินได้เนื่องจากกิจกรรมสิ้นสุดแล้ว</p>
+                            <p className="text-xs md:text-sm">ไม่สามารถเช็คอินได้เนื่องจากกิจกรรมสิ้นสุดแล้ว</p>
                           </div>
                         </div>
                       )}
@@ -392,7 +430,7 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
                           <AlertCircle className="h-5 w-5 flex-shrink-0" />
                           <div>
                             <p className="font-medium">ไม่มีสิทธิ์เข้าถึง</p>
-                            <p className="text-sm">คุณไม่มีสิทธิ์ในการเช็คอินกิจกรรมนี้</p>
+                            <p className="text-xs md:text-sm">คุณไม่มีสิทธิ์ในการเช็คอินกิจกรรมนี้</p>
                           </div>
                         </div>
                       )}
@@ -401,7 +439,7 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
                       {checkins && checkins.length > 0 && (
                         <div className="space-y-4">
                           <Separator />
-                          <h4 className="font-semibold text-lg">ประวัติการเช็คอิน</h4>
+                          <h4 className="font-semibold text-lg text-sm md:text-lg">ประวัติการเช็คอิน</h4>
                           <div className="space-y-3">
                             {checkins.map((checkin: EventCheckin, index: number) => (
                               <div
@@ -416,13 +454,13 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
                                   </div>
                                   <div className="flex-1 space-y-2">
                                     <div className="flex md:flex-row flex-col items-start md:items-center justify-between">
-                                      <span className="font-medium text-green-800">เช็คอิน #{index + 1}</span>
-                                      <span className="text-sm text-green-600 flex items-center gap-1">
+                                      <span className="font-medium text-green-800 text-sm md:text-base">เช็คอิน #{index + 1}</span>
+                                      <span className="text-xs md:text-sm text-green-600 flex items-center gap-1">
                                         <Clock className="h-3 w-3" />
                                         {formatThaiDate(checkin.created_at)}
                                       </span>
                                     </div>
-                                    <p className="text-gray-700 leading-relaxed">{checkin.detail}</p>
+                                    <p className="text-gray-700 leading-relaxed text-sm md:text-base">{checkin.detail}</p>
                                     {checkin.images && checkin.images.length > 0 && (
                                       <div className="pt-2">
                                         <ImageGallery
@@ -443,8 +481,8 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
                       {(!checkins || checkins.length === 0) && !isEventPassed && (
                         <div className="text-center py-8 text-gray-500">
                           <CheckCircle2 className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                          <p className="font-medium">ยังไม่มีการเช็คอิน</p>
-                          <p className="text-sm">ประวัติการเช็คอินจะแสดงที่นี่เมื่อมีการเช็คอิน</p>
+                          <p className="font-medium text-sm md:text-base">ยังไม่มีการเช็คอิน</p>
+                          <p className="text-xs md:text-sm">ประวัติการเช็คอินจะแสดงที่นี่เมื่อมีการเช็คอิน</p>
                         </div>
                       )}
                     </CardContent>
@@ -464,14 +502,14 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
                                     <MapPin className="h-5 w-5 text-blue-600" />
                                   </div>
                                   <div>
-                                    <h3 className="font-semibold text-blue-800">สถานะเบิกสินค้า</h3>
+                                    <h3 className="font-semibold text-blue-800 text-sm md:text-base">สถานะเบิกสินค้า</h3>
                                   </div>
                                 </div>
                                 <div className="flex items-center gap-2">
                                   {isLoadingTimeline ? (
                                     <Skeleton className="h-6 w-24" />
                                   ) : (
-                                    <Badge variant="outline" className="text-blue-600 border-blue-200">
+                                    <Badge variant="outline" className="text-blue-600 border-blue-200 text-xs md:text-sm">
                                       {trackingSteps.filter((step: EventTimelineStep) => step.status === "completed").length}/
                                       {trackingSteps.length} เสร็จสิ้น
                                     </Badge>

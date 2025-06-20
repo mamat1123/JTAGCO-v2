@@ -20,6 +20,11 @@ export interface BackendEvent {
   userFullName: string;
   subTypeName: string;
   mainTypeName: string;
+  customers?: {
+    email: string;
+    phone: string;
+    contact_name: string;
+  };
 }
 
 export interface CalendarEvent {
@@ -47,6 +52,11 @@ export interface CalendarEvent {
     detail: string;
     created_at: string;
   }[];
+  customers?: {
+    email: string;
+    phone: string;
+    contact_name: string;
+  };
 }
 
 export interface QueryEventDto {
