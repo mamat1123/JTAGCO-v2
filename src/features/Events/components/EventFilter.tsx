@@ -13,6 +13,7 @@ import { ProfileSelect } from '@/features/Profile/components/ProfileSelect';
 import { EventStatus } from '@/shared/types/events';
 import { useEventMainTypes } from '../hooks/useEventMainTypes';
 import { useEventSubTypes, EventSubType } from '../hooks/useEventSubTypes';
+import { useProducts } from '@/features/Settings/Products/hooks/useProducts';
 import { cn } from '@/shared/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -26,6 +27,7 @@ export interface EventFilters {
   user_id: string;
   main_type_id: string;
   sub_type_id: string;
+  tagged_product_id: string;
 }
 
 export const EventFilter = ({ onFilterChange }: EventFilterProps) => {
@@ -36,6 +38,7 @@ export const EventFilter = ({ onFilterChange }: EventFilterProps) => {
     user_id: 'all',
     main_type_id: 'all',
     sub_type_id: 'all',
+    tagged_product_id: 'all',
   });
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
@@ -44,6 +47,7 @@ export const EventFilter = ({ onFilterChange }: EventFilterProps) => {
   const { data: subTypes = [], isLoading: isLoadingSubTypes } = useEventSubTypes(
     filters.main_type_id !== 'all' ? filters.main_type_id : undefined
   );
+  const { data: products = [], isLoading: isLoadingProducts } = useProducts();
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -229,6 +233,33 @@ export const EventFilter = ({ onFilterChange }: EventFilterProps) => {
                   </SelectContent>
                 </Select>
               </motion.div>
+
+              {/* Product Filter */}
+              <motion.div 
+                className="flex flex-col gap-2"
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.5 }}
+              >
+                <label className="text-sm font-medium">สินค้า (tag)</label>
+                <Select
+                  value={filters.tagged_product_id}
+                  onValueChange={(value) => handleFilterChange('tagged_product_id', value)}
+                  disabled={isLoadingProducts}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={isLoadingProducts ? "กำลังโหลด..." : "เลือกสินค้า"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">ทั้งหมด</SelectItem>
+                    {products.map((product) => (
+                      <SelectItem key={product.id} value={product.id.toString()}>
+                        {product.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </motion.div>
             </div>
 
             {/* Reset Filters Button */}
@@ -236,7 +267,7 @@ export const EventFilter = ({ onFilterChange }: EventFilterProps) => {
               className="flex justify-end mt-4"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.5 }}
+              transition={{ delay: 0.6 }}
             >
               <Button
                 variant="outline"
@@ -247,6 +278,7 @@ export const EventFilter = ({ onFilterChange }: EventFilterProps) => {
                     user_id: 'all',
                     main_type_id: 'all',
                     sub_type_id: 'all',
+                    tagged_product_id: 'all',
                   });
                   onFilterChange({
                     search: '',
@@ -254,6 +286,7 @@ export const EventFilter = ({ onFilterChange }: EventFilterProps) => {
                     user_id: 'all',
                     main_type_id: 'all',
                     sub_type_id: 'all',
+                    tagged_product_id: 'all',
                   });
                 }}
                 className="w-full sm:w-auto"

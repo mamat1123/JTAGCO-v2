@@ -26,6 +26,7 @@ import {
   Mail,
   Phone,
   Contact,
+  Tag,
 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { useState, useEffect, useMemo } from "react";
@@ -329,6 +330,33 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
                             </div>
                           </div>
                         )}
+
+                        {/* Product Tags Section */}
+                        <div className="space-y-2">
+                          <h4 className="font-semibold text-gray-900 text-sm md:text-base flex items-center gap-2">
+                            <Tag className="h-4 w-4 md:h-5 md:w-5 text-blue-600" />
+                            แท็กสินค้า
+                          </h4>
+                          <div className="p-4 bg-gray-50 rounded-lg">
+                            {displayEvent.taggedProducts && displayEvent.taggedProducts.length > 0 ? (
+                              <div className="flex flex-wrap gap-2">
+                                {displayEvent.taggedProducts.map((product) => (
+                                  <Badge
+                                    key={product.id}
+                                    variant="secondary"
+                                    className="bg-blue-100 text-blue-800 hover:bg-blue-200 border-blue-200 text-xs md:text-sm px-3 py-1"
+                                  >
+                                    {product.name}
+                                  </Badge>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="text-gray-500 text-sm md:text-base italic">
+                                ไม่มีสินค้าแท็กไว้
+                              </p>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>

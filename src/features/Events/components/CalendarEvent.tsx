@@ -90,7 +90,8 @@ export function Calendar({ className }: Omit<CalendarProps, "events">) {
     status: 'all',
     user_id: 'all',
     main_type_id: 'all',
-    sub_type_id: 'all'
+    sub_type_id: 'all',
+    tagged_product_id: 'all'
   });
 
   const handleFilterChange = (newFilters: typeof filters) => {
@@ -107,7 +108,8 @@ export function Calendar({ className }: Omit<CalendarProps, "events">) {
     status: filters.status !== 'all' ? filters.status as EventStatus : undefined,
     user_id: filters.user_id !== 'all' ? filters.user_id : undefined,
     main_type_id: filters.main_type_id !== 'all' ? filters.main_type_id : undefined,
-    sub_type_id: filters.sub_type_id !== 'all' ? filters.sub_type_id : undefined
+    sub_type_id: filters.sub_type_id !== 'all' ? filters.sub_type_id : undefined,
+    tagged_product_id: filters.tagged_product_id !== 'all' ? filters.tagged_product_id : undefined
   });
 
   const events: CalendarEvent[] = React.useMemo(() =>

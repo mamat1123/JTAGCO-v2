@@ -16,7 +16,9 @@ import { companyAPI } from "@/entities/Company/companyAPI";
 import { Company } from "@/entities/Company/company";
 import { useEventMainTypes } from "../hooks/useEventMainTypes";
 import { useEventSubTypes } from "../hooks/useEventSubTypes";
+import { useProducts } from "@/features/Settings/Products/hooks/useProducts";
 import { SelectProductDialog } from "../components/SelectProductDialog";
+import { ProductTagSelector } from "../components/ProductTagSelector";
 import { Product, ProductVariant } from "@/entities/Product/product";
 import { ImageUploader } from "@/shared/components/ImageUploader/ImageUploader";
 import { CompanyHeader } from "../components/CompanyHeader";
@@ -58,6 +60,7 @@ export function CreateEventPage() {
     company_id: companyId || "",
     customer_id: "",
     image_urls: [] as string[],
+    tagged_products: [] as string[],
   });
   const [date, setDate] = React.useState<Date>(new Date());
   const [testDateRange, setTestDateRange] = React.useState<{
@@ -72,6 +75,7 @@ export function CreateEventPage() {
   const { data: subTypes = [], isLoading: isLoadingSubTypes } = useEventSubTypes(
     formData.main_type_id || undefined
   );
+  const { data: products = [], isLoading: isLoadingProducts } = useProducts();
 
   React.useEffect(() => {
     const fetchCompany = async () => {
@@ -124,6 +128,7 @@ export function CreateEventPage() {
             quantity: p.quantity,
             return_date: p.return_date ? adjustDate(p.return_date) : null
           })),
+        tagged_products: formData.tagged_products,
       }
       await createEvent.mutateAsync(body);
       toast.success("สร้างกิจกรรมสำเร็จ");
@@ -291,6 +296,15 @@ export function CreateEventPage() {
                 className="w-full"
               />
             </div>
+
+            <ProductTagSelector
+              products={products}
+              selectedProductIds={formData.tagged_products}
+              onSelectionChange={(productIds) => 
+                setFormData(prev => ({ ...prev, tagged_products: productIds }))
+              }
+              isLoading={isLoadingProducts}
+            />
 
             {showProductSelection && (
               <ProductSelectionTable
