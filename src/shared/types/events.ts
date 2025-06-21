@@ -55,6 +55,7 @@ export interface CalendarEvent {
   taggedProducts?: {
     id: string;
     name: string;
+    price: number;
   }[];
   customers?: {
     email: string;
