@@ -173,7 +173,13 @@ export const InactiveCompaniesPage = () => {
                     <SelectItem value="2">2 เดือน</SelectItem>
                     <SelectItem value="3">3 เดือน</SelectItem>
                     <SelectItem value="4">4 เดือน</SelectItem>
+                    <SelectItem value="5">5 เดือน</SelectItem>
                     <SelectItem value="6">6 เดือน</SelectItem>
+                    <SelectItem value="7">7 เดือน</SelectItem>
+                    <SelectItem value="8">8 เดือน</SelectItem>
+                    <SelectItem value="9">9 เดือน</SelectItem>
+                    <SelectItem value="10">10 เดือน</SelectItem>
+                    <SelectItem value="11">11 เดือน</SelectItem>
                     <SelectItem value="12">12 เดือน</SelectItem>
                   </SelectContent>
                 </Select>
