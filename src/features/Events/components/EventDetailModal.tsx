@@ -346,7 +346,7 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
                                     variant="secondary"
                                     className="bg-blue-100 text-blue-800 hover:bg-blue-200 border-blue-200 text-xs md:text-sm px-3 py-1"
                                   >
-                                    {product.name}
+                                    {product.name} ({product.price.toLocaleString("th-TH", { style: "currency", currency: "THB" })})
                                   </Badge>
                                 ))}
                               </div>
