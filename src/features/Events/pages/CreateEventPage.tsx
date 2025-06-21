@@ -42,6 +42,12 @@ interface SelectedProduct {
   return_date: Date | null;
 }
 
+interface TaggedProduct {
+  product_id: string;
+  name: string;
+  price: number;
+}
+
 export function CreateEventPage() {
   const navigate = useNavigate();
   const { companyId } = useParams<{ companyId: string }>();
@@ -60,7 +66,7 @@ export function CreateEventPage() {
     company_id: companyId || "",
     customer_id: "",
     image_urls: [] as string[],
-    tagged_products: [] as string[],
+    tagged_products: [] as TaggedProduct[],
   });
   const [date, setDate] = React.useState<Date>(new Date());
   const [testDateRange, setTestDateRange] = React.useState<{
@@ -128,7 +134,10 @@ export function CreateEventPage() {
             quantity: p.quantity,
             return_date: p.return_date ? adjustDate(p.return_date) : null
           })),
-        tagged_products: formData.tagged_products,
+        tagged_products: formData.tagged_products.map(tp => ({
+          product_id: tp.product_id,
+          price: tp.price
+        })),
       }
       await createEvent.mutateAsync(body);
       toast.success("สร้างกิจกรรมสำเร็จ");
@@ -299,9 +308,9 @@ export function CreateEventPage() {
 
             <ProductTagSelector
               products={products}
-              selectedProductIds={formData.tagged_products}
-              onSelectionChange={(productIds) => 
-                setFormData(prev => ({ ...prev, tagged_products: productIds }))
+              taggedProducts={formData.tagged_products}
+              onTaggedProductsChange={(taggedProducts) => 
+                setFormData(prev => ({ ...prev, tagged_products: taggedProducts }))
               }
               isLoading={isLoadingProducts}
             />
