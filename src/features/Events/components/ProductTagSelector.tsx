@@ -1,7 +1,8 @@
 import * as React from "react";
-import { Check, ChevronsUpDown, X } from "lucide-react";
+import { ChevronsUpDown, X } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { Label } from "@/shared/components/ui/label";
+import { Input } from "@/shared/components/ui/input";
 import {
   Command,
   CommandEmpty,
@@ -15,113 +16,174 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/shared/components/ui/popover";
-import { Badge } from "@/shared/components/ui/badge";
-import { cn } from "@/shared/lib/utils";
 import { Product } from "@/entities/Product/product";
+
+interface TaggedProduct {
+  product_id: string;
+  name: string;
+  price: number;
+}
 
 interface ProductTagSelectorProps {
   products: Product[];
-  selectedProductIds: string[];
-  onSelectionChange: (productIds: string[]) => void;
+  taggedProducts: TaggedProduct[];
+  onTaggedProductsChange: (taggedProducts: TaggedProduct[]) => void;
   isLoading?: boolean;
 }
 
 export function ProductTagSelector({
   products,
-  selectedProductIds,
-  onSelectionChange,
+  taggedProducts,
+  onTaggedProductsChange,
   isLoading = false,
 }: ProductTagSelectorProps) {
   const [open, setOpen] = React.useState(false);
+  const [selectedProductId, setSelectedProductId] = React.useState<string>("");
+  const [newProductPrice, setNewProductPrice] = React.useState<number>(0);
 
-  const selectedProducts = products.filter(product => 
-    selectedProductIds.includes(product.id)
+  const selectedProductIds = taggedProducts.map(tp => tp.product_id);
+  const availableProducts = products.filter(product => 
+    !selectedProductIds.includes(product.id)
   );
 
   const handleSelect = (productId: string) => {
-    const isSelected = selectedProductIds.includes(productId);
-    if (isSelected) {
-      onSelectionChange(selectedProductIds.filter(id => id !== productId));
-    } else {
-      onSelectionChange([...selectedProductIds, productId]);
+    setSelectedProductId(productId);
+    setNewProductPrice(0);
+  };
+
+  const handleAddTaggedProduct = () => {
+    if (!selectedProductId || newProductPrice <= 0) {
+      return;
     }
+
+    const product = products.find(p => p.id === selectedProductId);
+    if (!product) return;
+
+    const newTaggedProduct: TaggedProduct = {
+      product_id: selectedProductId,
+      name: product.name,
+      price: newProductPrice
+    };
+
+    onTaggedProductsChange([...taggedProducts, newTaggedProduct]);
+    setSelectedProductId("");
+    setNewProductPrice(0);
+    setOpen(false);
   };
 
   const handleRemoveTag = (productId: string) => {
-    onSelectionChange(selectedProductIds.filter(id => id !== productId));
+    onTaggedProductsChange(taggedProducts.filter(tp => tp.product_id !== productId));
+  };
+
+  const handlePriceChange = (productId: string, price: number) => {
+    onTaggedProductsChange(taggedProducts.map(tp =>
+      tp.product_id === productId ? { ...tp, price } : tp
+    ));
   };
 
   return (
-    <div className="space-y-2">
-      <Label>แท็กสินค้า (Products related to this event)</Label>
+    <div className="space-y-4">
+      <Label className="">สินค้าที่แนะนำ</Label>
       
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className="w-full justify-between"
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              "กำลังโหลดสินค้า..."
-            ) : selectedProductIds.length === 0 ? (
-              "เลือกสินค้าที่เกี่ยวข้อง..."
-            ) : (
-              `เลือกแล้ว ${selectedProductIds.length} รายการ`
-            )}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
-          <Command>
-            <CommandInput placeholder="ค้นหาสินค้า..." />
-            <CommandList>
-              <CommandEmpty>ไม่พบสินค้า</CommandEmpty>
-              <CommandGroup>
-                {products.map((product) => (
-                  <CommandItem
-                    key={product.id}
-                    value={product.name}
-                    onSelect={() => handleSelect(product.id)}
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        selectedProductIds.includes(product.id)
-                          ? "opacity-100"
-                          : "opacity-0"
-                      )}
-                    />
-                    {product.name}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
-
-      {selectedProducts.length > 0 && (
-        <div className="flex flex-wrap gap-2 mt-2">
-          {selectedProducts.map((product) => (
-            <Badge
-              key={product.id}
-              variant="secondary"
-              className="flex items-center gap-1"
+      {/* Add new tagged product form */}
+      <div className="flex flex-col sm:flex-row gap-2">
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={open}
+              className="w-full sm:w-64 justify-between"
+              disabled={isLoading || availableProducts.length === 0}
             >
-              {product.name}
-              <button
-                type="button"
-                onClick={() => handleRemoveTag(product.id)}
-                className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
-              >
-                <X className="h-3 w-3" />
-                <span className="sr-only">ลบ {product.name}</span>
-              </button>
-            </Badge>
-          ))}
+              {isLoading ? (
+                "กำลังโหลดสินค้า..."
+              ) : availableProducts.length === 0 ? (
+                "ไม่มีสินค้าให้เลือก"
+              ) : selectedProductId ? (
+                products.find(p => p.id === selectedProductId)?.name || "เลือกสินค้า"
+              ) : (
+                "เลือกสินค้า"
+              )}
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+            <Command>
+              <CommandInput placeholder="ค้นหาสินค้า..." />
+              <CommandList>
+                <CommandEmpty>ไม่พบสินค้า</CommandEmpty>
+                <CommandGroup>
+                  {availableProducts.map((product) => (
+                    <CommandItem
+                      key={product.id}
+                      value={product.name}
+                      onSelect={() => handleSelect(product.id)}
+                    >
+                      {product.name}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+        
+        <Input
+          type="number"
+          placeholder="ราคา"
+          value={newProductPrice || ""}
+          onChange={(e) => setNewProductPrice(Number(e.target.value) || 0)}
+          className="w-full sm:w-32"
+          min="0"
+          step="0.01"
+        />
+        
+        <Button
+          type="button"
+          onClick={handleAddTaggedProduct}
+          className="w-full sm:w-auto"
+          disabled={!selectedProductId || newProductPrice <= 0}
+        >
+          เพิ่มสินค้า
+        </Button>
+      </div>
+
+      {/* Tagged products table */}
+      {taggedProducts.length > 0 && (
+        <div className="border rounded-lg">
+          <div className="bg-muted/50 px-4 py-2 border-b">
+            <h4 className="font-medium">สินค้าที่แท็กแล้ว</h4>
+          </div>
+          <div className="divide-y">
+            {taggedProducts.map((taggedProduct) => (
+              <div key={taggedProduct.product_id} className="flex items-center justify-between p-4">
+                <div className="flex-1">
+                  <p className="font-medium">{taggedProduct.name}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    value={taggedProduct.price || ""}
+                    onChange={(e) => handlePriceChange(taggedProduct.product_id, Number(e.target.value) || 0)}
+                    className="w-24"
+                    min="0"
+                    step="0.01"
+                  />
+                  <span className="text-sm text-muted-foreground">บาท</span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleRemoveTag(taggedProduct.product_id)}
+                    className="h-8 w-8 p-0"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
