@@ -52,6 +52,10 @@ export interface CalendarEvent {
     detail: string;
     created_at: string;
   }[];
+  taggedProducts?: {
+    id: string;
+    name: string;
+  }[];
   customers?: {
     email: string;
     phone: string;
@@ -68,6 +72,7 @@ export interface QueryEventDto {
   sub_type_id?: string;
   search?: string;
   user_id?: string;
+  tagged_product_id?: string;
 }
 
 export interface CalendarProps {

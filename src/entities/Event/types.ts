@@ -39,7 +39,8 @@ export interface QueryEventParams {
   scheduled_at_end?: string;
   main_type_id?: string;
   sub_type_id?: string;
-} 
+  tagged_product_id?: string;
+}
 
 export interface EventCheckinDto {
   detail?: string;

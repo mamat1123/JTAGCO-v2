@@ -17,6 +17,7 @@ import { ApproveUserPage } from '@/features/Settings/Users/ApproveUserPage';
 import { ShoeRequestsPage } from '@/features/ShoeRequests/ShoeRequestsPage';
 import { AdminRoute } from '@/features/Auth/AdminRoute';
 import { InactiveCompaniesPage } from '@/features/InactiveCompanies/InactiveCompaniesPage';
+import { CompanyTransfersPage } from '@/features/CompanyTransfers/CompanyTransfersPage';
 
 export const router = createBrowserRouter([
   {
@@ -119,6 +120,14 @@ export const router = createBrowserRouter([
           </SuperAdminRoute>
         ),
       },
+      {
+        path: 'transfers',
+        element: (
+          <SuperAdminRoute>
+            <CompanyTransfersPage />
+          </SuperAdminRoute>
+        ),  
+      }
     ],
   }
 ]);
