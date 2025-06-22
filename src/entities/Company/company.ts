@@ -93,6 +93,7 @@ export interface CompanyFilters {
   province?: string;
   email?: string;
   user_id?: string;
+  tagged_product_id?: string;
 }
 
 export interface InactiveCompaniesDto {
