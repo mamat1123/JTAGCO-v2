@@ -39,7 +39,7 @@ export function ProductTagSelector({
 }: ProductTagSelectorProps) {
   const [open, setOpen] = React.useState(false);
   const [selectedProductId, setSelectedProductId] = React.useState<string>("");
-  const [newProductPrice, setNewProductPrice] = React.useState<number>(0);
+  const [newProductPrice, setNewProductPrice] = React.useState<string>("");
 
   const selectedProductIds = taggedProducts.map(tp => tp.product_id);
   const availableProducts = products.filter(product => 
@@ -48,11 +48,11 @@ export function ProductTagSelector({
 
   const handleSelect = (productId: string) => {
     setSelectedProductId(productId);
-    setNewProductPrice(0);
+    setNewProductPrice("");
   };
 
   const handleAddTaggedProduct = () => {
-    if (!selectedProductId || newProductPrice <= 0) {
+    if (!selectedProductId) {
       return;
     }
 
@@ -62,12 +62,12 @@ export function ProductTagSelector({
     const newTaggedProduct: TaggedProduct = {
       product_id: selectedProductId,
       name: product.name,
-      price: newProductPrice
+      price: Number(newProductPrice) || 0
     };
 
     onTaggedProductsChange([...taggedProducts, newTaggedProduct]);
     setSelectedProductId("");
-    setNewProductPrice(0);
+    setNewProductPrice("");
     setOpen(false);
   };
 
@@ -132,8 +132,8 @@ export function ProductTagSelector({
         <Input
           type="number"
           placeholder="ราคา"
-          value={newProductPrice || ""}
-          onChange={(e) => setNewProductPrice(Number(e.target.value) || 0)}
+          value={newProductPrice}
+          onChange={(e) => setNewProductPrice(e.target.value)}
           className="w-full sm:w-32"
           min="0"
           step="0.01"
@@ -143,7 +143,7 @@ export function ProductTagSelector({
           type="button"
           onClick={handleAddTaggedProduct}
           className="w-full sm:w-auto"
-          disabled={!selectedProductId || newProductPrice <= 0}
+          disabled={!selectedProductId}
         >
           เพิ่มสินค้า
         </Button>
