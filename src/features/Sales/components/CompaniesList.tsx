@@ -27,7 +27,8 @@ export function CompaniesList() {
   const [filters, setFilters] = useState<CompanyFilters>({
     search: '',
     province: 'all',
-    user_id: 'all'
+    user_id: 'all',
+    tagged_product_id: 'all'
   });
   const observer = useRef<IntersectionObserver | null>(null);
   const itemsPerPage = 10;
@@ -56,6 +57,7 @@ export function CompaniesList() {
         const response = await CompaniesService.fetchCompanies({
           page,
           limit: itemsPerPage,
+          tagged_product_id: filters.tagged_product_id === 'all' ? undefined : filters.tagged_product_id,
           search: filters.search,
           province: filters.province === 'all' ? undefined : filters.province,
           user_id: profile?.role === UserRole.SALES ? profile.id : (filters.user_id === 'all' ? undefined : filters.user_id)

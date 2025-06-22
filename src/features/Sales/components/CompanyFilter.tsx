@@ -14,6 +14,7 @@ import {
 } from "@/shared/components/ui/select";
 import { PROVINCES } from '@/shared/constants/provinces';
 import { ProfileSelect } from '@/features/Profile/components/ProfileSelect';
+import { useProducts } from '@/features/Settings/Products/hooks/useProducts';
 
 interface CompanyFilterProps {
   onFilterChange: (filters: CompanyFilters) => void;
@@ -23,6 +24,7 @@ export interface CompanyFilters {
   search: string;
   province: string;
   user_id: string;
+  tagged_product_id: string;
 }
 
 export const CompanyFilter = ({ onFilterChange }: CompanyFilterProps) => {
@@ -30,11 +32,13 @@ export const CompanyFilter = ({ onFilterChange }: CompanyFilterProps) => {
   const [filters, setFilters] = useState<CompanyFilters>({
     search: '',
     province: 'all',
-    user_id: 'all'
+    user_id: 'all',
+    tagged_product_id: 'all'
   });
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const searchTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const { data: products = [], isLoading: isLoadingProducts } = useProducts();
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -75,11 +79,18 @@ export const CompanyFilter = ({ onFilterChange }: CompanyFilterProps) => {
     onFilterChange(newFilters);
   };
 
+  const handleProductChange = (value: string) => {
+    const newFilters = { ...filters, tagged_product_id: value };
+    setFilters(newFilters);
+    onFilterChange(newFilters);
+  };
+
   const clearFilters = () => {
     const clearedFilters = {
       search: '',
       province: 'all',
-      user_id: 'all'
+      user_id: 'all',
+      tagged_product_id: 'all'
     };
     setFilters(clearedFilters);
     setSearchInput('');
@@ -137,7 +148,7 @@ export const CompanyFilter = ({ onFilterChange }: CompanyFilterProps) => {
             className="overflow-hidden"
           >
             <Card className="p-4 mt-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <motion.div 
                   className="flex flex-col gap-2"
                   initial={{ x: -20, opacity: 0 }}
@@ -176,9 +187,35 @@ export const CompanyFilter = ({ onFilterChange }: CompanyFilterProps) => {
                     placeholder="เลือกผู้ดูแล"
                   />
                 </motion.div>
+
+                <motion.div 
+                  className="flex flex-col gap-2"
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <label className="text-sm font-medium">สินค้า (tag)</label>
+                  <Select
+                    value={filters.tagged_product_id}
+                    onValueChange={handleProductChange}
+                    disabled={isLoadingProducts}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={isLoadingProducts ? "กำลังโหลด..." : "เลือกสินค้า"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">ทั้งหมด</SelectItem>
+                      {products.map((product) => (
+                        <SelectItem key={product.id} value={product.id.toString()}>
+                          {product.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </motion.div>
               </div>
 
-              {(filters.search || filters.province !== 'all' || filters.user_id !== 'all') && (
+              {(filters.search || filters.province !== 'all' || filters.user_id !== 'all' || filters.tagged_product_id !== 'all') && (
                 <div className="flex justify-end mt-4">
                   <Button
                     variant="ghost"
