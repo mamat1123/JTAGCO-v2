@@ -82,10 +82,44 @@ export function ProductVariantFormDialog({
     console.log(formData);
   }, [formData]);
 
+  // Add useEffect to update productId in formData when productId prop changes
+  useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      product_id: productId
+    }));
+  }, [productId]);
+
 
   // Handle modal close
   const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      // Reset all form data when modal is closed
+      resetForm();
+    }
     onOpenChange(open);
+  };
+
+  // Add reset function to clear all form data
+  const resetForm = () => {
+    setFormData({
+      product_id: productId,
+      sku: '',
+      attributes: {},
+      is_made_to_order: false,
+      price: 0,
+      stock: 0,
+    });
+    setSelectedAttributeType("");
+    setAttributeValue("");
+    setCustomAttributeKey("");
+    setIsCustomAttribute(false);
+    setSizeRange({ min: 0, max: 0 });
+    setSelectedColors([]);
+    setCustomColor("");
+    setSteelPlateValue("");
+    setShowUnsavedModal(false);
+    setHasUnsavedAttributes(false);
   };
 
   // Add this function to check for unsaved attributes
@@ -122,6 +156,7 @@ export function ProductVariantFormDialog({
       return;
     }
     onSubmit(formData as CreateProductVariantDTO);
+    handleOpenChange(false);
   };
 
   const handleConfirmSubmit = () => {
