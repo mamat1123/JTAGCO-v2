@@ -89,48 +89,50 @@ export function SelectProductDialog({
             />
 
             <div className="border rounded-md">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ชื่อสินค้า</TableHead>
-                    <TableHead>ประเภท</TableHead>
-                    <TableHead>รายละเอียด</TableHead>
-                    <TableHead className="w-[100px]">เลือก</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {isLoading ? (
+              <div className="h-[400px] overflow-y-auto">
+                <Table>
+                  <TableHeader>
                     <TableRow>
-                      <TableCell colSpan={4} className="text-center">
-                        กำลังโหลด...
-                      </TableCell>
+                      <TableHead>ชื่อสินค้า</TableHead>
+                      <TableHead>ประเภท</TableHead>
+                      <TableHead>รายละเอียด</TableHead>
+                      <TableHead className="w-[100px]">เลือก</TableHead>
                     </TableRow>
-                  ) : filteredProducts.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={4} className="text-center">
-                        ไม่พบสินค้า
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    filteredProducts.map((product) => (
-                      <TableRow key={product.id}>
-                        <TableCell>{product.name}</TableCell>
-                        <TableCell>{product.type}</TableCell>
-                        <TableCell>{product.description}</TableCell>
-                        <TableCell>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleProductSelect(product)}
-                          >
-                            เลือก
-                          </Button>
+                  </TableHeader>
+                  <TableBody>
+                    {isLoading ? (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center">
+                          กำลังโหลด...
                         </TableCell>
                       </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
+                    ) : filteredProducts.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center">
+                          ไม่พบสินค้า
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      filteredProducts.map((product) => (
+                        <TableRow key={product.id}>
+                          <TableCell>{product.name}</TableCell>
+                          <TableCell>{product.type}</TableCell>
+                          <TableCell>{product.description}</TableCell>
+                          <TableCell>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleProductSelect(product)}
+                            >
+                              เลือก
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
           </div>
         </DialogContent>
