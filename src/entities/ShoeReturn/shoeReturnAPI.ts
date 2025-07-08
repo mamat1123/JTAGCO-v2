@@ -1,37 +1,33 @@
 import { ShoeReturn, ShoeReturnWithDetails } from './shoeReturn';
+import { api } from '@/shared/config/api';
+import { AxiosError } from 'axios';
 
-class ShoeReturnAPI {
-  private baseUrl = '/api/shoe-returns';
+const API_BASE_URL = '/shoe-returns';
 
-  async getAll(): Promise<ShoeReturnWithDetails[]> {
-    const response = await fetch(this.baseUrl);
-    if (!response.ok) {
-      throw new Error('Failed to fetch shoe returns');
+export const shoeReturnAPI = {
+  getAll: async (): Promise<ShoeReturnWithDetails[]> => {
+    const response = await api.get<ShoeReturnWithDetails[]>(API_BASE_URL);
+    return response.data;
+  },
+
+  getById: async (id: string): Promise<ShoeReturnWithDetails | null> => {
+    try {
+      const response = await api.get<ShoeReturnWithDetails>(`${API_BASE_URL}/${id}`);
+      return response.data;
+    } catch (error) {
+      if (error instanceof AxiosError && error.response?.status === 404) {
+        return null;
+      }
+      throw error;
     }
-    return response.json();
-  }
+  },
 
-  async create(data: Omit<ShoeReturn, 'id' | 'createdAt' | 'returnedAt'>): Promise<ShoeReturn> {
-    const response = await fetch(this.baseUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-    if (!response.ok) {
-      throw new Error('Failed to create shoe return');
-    }
-    return response.json();
-  }
+  create: async (data: Omit<ShoeReturn, 'id' | 'createdAt' | 'returnedAt'>): Promise<ShoeReturn> => {
+    const response = await api.post<ShoeReturn>(API_BASE_URL, data);
+    return response.data;
+  },
 
-  async getById(id: string): Promise<ShoeReturnWithDetails> {
-    const response = await fetch(`${this.baseUrl}/${id}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch shoe return');
-    }
-    return response.json();
-  }
-}
-
-export const shoeReturnAPI = new ShoeReturnAPI(); 
+  receive: async (eventShoeVariantId: string, shoeRequestId: string, comment: string, quantity: number): Promise<void> => {
+    await api.post(`${API_BASE_URL}/${eventShoeVariantId}/receive`, { shoeRequestId, comment, quantity });
+  },
+}; 

@@ -1,12 +1,12 @@
-import { ShoeRequest, ShoeRequestFilters, PaginatedResponse } from './types';
+import { ShoeRequest, ShoeRequestFilters, EventRequest } from './types';
 import { api } from '@/shared/config/api';
 import { AxiosError } from 'axios';
 
 const API_BASE_URL = '/shoe-requests';
 
 export const shoeRequestAPI = {
-  getAll: async (filters?: ShoeRequestFilters): Promise<PaginatedResponse<ShoeRequest>> => {
-    const response = await api.get<PaginatedResponse<ShoeRequest>>(API_BASE_URL, { params: filters });
+  getAll: async (filters?: ShoeRequestFilters): Promise<{ data: EventRequest[], total: number }> => {
+    const response = await api.get<{ data: EventRequest[], total: number }>(API_BASE_URL, { params: filters });
     return response.data;
   },
 
@@ -38,4 +38,6 @@ export const shoeRequestAPI = {
   reject: async (id: string, comment: string): Promise<void> => {
     return shoeRequestAPI.updateStatus(id, 'rejected', comment);
   },
+
+  
 };
