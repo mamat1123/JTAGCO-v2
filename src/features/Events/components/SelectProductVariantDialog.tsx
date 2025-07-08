@@ -39,7 +39,7 @@ import {
 interface SelectProductVariantDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onSelect: (variant: ProductVariant, returnDate: Date | null) => void;
+  onSelect: (variant: ProductVariant, returnDate: Date | null, pickupDate: Date | null) => void;
   productId: string;
 }
 
@@ -53,6 +53,7 @@ export function SelectProductVariantDialog({
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedReturnDate, setSelectedReturnDate] = useState<Date | null>(null);
+  const [selectedPickupDate, setSelectedPickupDate] = useState<Date | null>(null);
 
   useEffect(() => {
     const fetchVariants = async () => {
@@ -60,7 +61,7 @@ export function SelectProductVariantDialog({
         setIsLoading(true);
         const data = await productAPI.getProductVariants(productId);
         setVariants(data);
-      } catch (err) {
+      } catch {
         toast.error('ไม่สามารถดึงข้อมูลตัวเลือกสินค้าได้');
       } finally {
         setIsLoading(false);
@@ -79,17 +80,18 @@ export function SelectProductVariantDialog({
   useEffect(() => {
     if (!isOpen) {
       setSelectedReturnDate(null);
+      setSelectedPickupDate(null);
     }
   }, [isOpen]);
 
-  const formatAttributes = (attributes: Record<string, any>) => {
+  const formatAttributes = (attributes: Record<string, string | number>) => {
     return Object.entries(attributes).map(([key, value]) => {
       if (key.toLowerCase() === 'image') {
         return (
           <div key={key} className="flex items-center gap-2 mb-2">
             <div className="relative w-16 h-16 flex-shrink-0">
               <img
-                src={value}
+                src={String(value)}
                 alt="Product variant"
                 className="w-full h-full object-cover rounded-md"
               />
@@ -126,6 +128,33 @@ export function SelectProductVariantDialog({
                   variant="outline"
                   className={cn(
                     "w-full sm:w-[240px] justify-start text-left font-normal",
+                    !selectedPickupDate && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {selectedPickupDate ? (
+                    format(selectedPickupDate, "PPP", { locale: th })
+                  ) : (
+                    <span>เลือกวันที่รับสินค้า</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={selectedPickupDate || undefined}
+                  onSelect={(date) => setSelectedPickupDate(date || null)}
+                  initialFocus
+                  locale={th}
+                />
+              </PopoverContent>
+            </Popover>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full sm:w-[240px] justify-start text-left font-normal",
                     !selectedReturnDate && "text-muted-foreground"
                   )}
                 >
@@ -144,6 +173,7 @@ export function SelectProductVariantDialog({
                   onSelect={(date) => setSelectedReturnDate(date || null)}
                   initialFocus
                   locale={th}
+                  disabled={(date) => selectedPickupDate ? date < selectedPickupDate : false}
                 />
               </PopoverContent>
             </Popover>
@@ -181,16 +211,22 @@ export function SelectProductVariantDialog({
                           key={variant.id}
                           className={cn(
                             "cursor-pointer hover:bg-muted/50",
-                            !selectedReturnDate && "hover:bg-destructive/10"
+                            (!selectedPickupDate || !selectedReturnDate) && "hover:bg-destructive/10"
                           )}
                           onClick={() => {
+                            if (!selectedPickupDate) {
+                              toast.error('กรุณาเลือกวันที่รับสินค้าก่อนเลือกตัวเลือกสินค้า', {
+                                duration: 3000,
+                              });
+                              return;
+                            }
                             if (!selectedReturnDate) {
                               toast.error('กรุณาเลือกวันที่คืนก่อนเลือกตัวเลือกสินค้า', {
                                 duration: 3000,
                               });
                               return;
                             }
-                            onSelect(variant, selectedReturnDate);
+                            onSelect(variant, selectedReturnDate, selectedPickupDate);
                             onOpenChange(false);
                           }}
                         >
@@ -213,15 +249,15 @@ export function SelectProductVariantDialog({
                                     size="sm"
                                     className={cn(
                                       "w-full",
-                                      !selectedReturnDate && "text-destructive hover:text-destructive"
+                                      (!selectedPickupDate || !selectedReturnDate) && "text-destructive hover:text-destructive"
                                     )}
                                   >
                                     เลือก
                                   </Button>
                                 </TooltipTrigger>
-                                {!selectedReturnDate && (
+                                {(!selectedPickupDate || !selectedReturnDate) && (
                                   <TooltipContent>
-                                    <p>กรุณาเลือกวันที่คืนก่อน</p>
+                                    <p>กรุณาเลือกวันที่รับสินค้าและวันที่คืนก่อน</p>
                                   </TooltipContent>
                                 )}
                               </Tooltip>

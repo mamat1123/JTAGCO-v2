@@ -21,11 +21,12 @@ interface SelectedProduct {
   variant?: {
     id: string;
     sku: string;
-    attributes: Record<string, any>;
+    attributes: Record<string, string | number>;
     price: number;
     stock: number;
   };
   return_date: Date | null;
+  pickup_date: Date | null;
 }
 
 interface ProductSelectionTableProps {
@@ -65,6 +66,7 @@ export function ProductSelectionTable({
                 <TableRow>
                   <TableHead>ชื่อสินค้า</TableHead>
                   <TableHead>ตัวเลือกสินค้า</TableHead>
+                  <TableHead>วันที่รับสินค้า</TableHead>
                   <TableHead>วันที่คืน</TableHead>
                   <TableHead className="w-[150px]">จำนวน</TableHead>
                   <TableHead className="w-[100px]"></TableHead>
@@ -104,6 +106,7 @@ export function ProductSelectionTable({
                         </div>
                       )}
                     </TableCell>
+                    <TableCell>{product.pickup_date ? format(product.pickup_date, "dd/MM/yyyy") : ''}</TableCell>
                     <TableCell>{product.return_date ? format(product.return_date, "dd/MM/yyyy") : ''}</TableCell>
                     <TableCell>
                       <Input

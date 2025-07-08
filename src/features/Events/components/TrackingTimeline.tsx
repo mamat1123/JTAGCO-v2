@@ -1,96 +1,132 @@
-import { CheckCircle2, Clock, AlertCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { formatThaiDate } from "@/shared/utils/dateUtils";
-import { Button } from "@/shared/components/ui/button";
+"use client"
 
-interface TrackingStep {
-  id: number;
-  title: string;
-  description: string;
-  date: string;
-  status: "completed" | "current" | "pending";
-}
+import { Check, Clock, Package, UserCheck, Truck, RotateCcw } from "lucide-react"
+import { Button } from "@/shared/components/ui/button"
+import { ApprovalDetails } from "./ApprovalDetails"
+import type { EventTimelineStep } from "../services/eventTimelineService"
 
 interface TrackingTimelineProps {
-  steps: TrackingStep[];
-  onReceiveProduct?: () => void;
+  steps: EventTimelineStep[]
+  onReceiveProduct?: () => void
+  onReturnProduct?: () => void
 }
 
-export function TrackingTimeline({ steps, onReceiveProduct }: TrackingTimelineProps) {
+export function TrackingTimeline({ steps, onReceiveProduct, onReturnProduct }: TrackingTimelineProps) {
+  const getStepIcon = (step: EventTimelineStep) => {
+    const iconClass = "h-4 w-4"
+
+    switch (step.id) {
+      case 1:
+        return <Package className={iconClass} />
+      case 2:
+        return <UserCheck className={iconClass} />
+      case 3:
+        return <Truck className={iconClass} />
+      case 4:
+        return <RotateCcw className={iconClass} />
+      default:
+        return <Clock className={iconClass} />
+    }
+  }
+
+  const getStatusColor = (status: EventTimelineStep["status"]) => {
+    switch (status) {
+      case "completed":
+        return "bg-green-500 text-white"
+      case "current":
+        return "bg-blue-500 text-white"
+      case "pending":
+        return "bg-gray-200 text-gray-500"
+      default:
+        return "bg-gray-200 text-gray-500"
+    }
+  }
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return ""
+    return new Date(dateString).toLocaleDateString("th-TH", {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+  }
+
+  const getApprovalSummary = (data: Array<{ status: string }>) => {
+    const approved = data.filter((item) => item.status === "approved").length
+    const rejected = data.filter((item) => item.status === "rejected").length
+    const pending = data.filter((item) => item.status === "pending").length
+    const total = data.length
+
+    const summary = `รวม ${total} รายการ: `
+    const parts = []
+
+    if (approved > 0) parts.push(`อนุมัติ ${approved} รายการ`)
+    if (rejected > 0) parts.push(`ไม่อนุมัติ ${rejected} รายการ`)
+    if (pending > 0) parts.push(`รอดำเนินการ ${pending} รายการ`)
+
+    return summary + parts.join(", ")
+  }
+
   return (
-    <div className="relative">
-      {/* Vertical line */}
-      <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200" />
-
-      <div className="space-y-6">
-        {steps.map((step, _) => (
-          <div key={step.id} className="relative flex gap-4">
-            {/* Icon */}
-            <div
-              className={cn(
-                "relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2",
-                step.status === "completed" && "border-green-500 bg-green-50",
-                step.status === "current" && "border-blue-500 bg-blue-50",
-                step.status === "pending" && "border-gray-300 bg-gray-50"
-              )}
-            >
-              {step.status === "completed" && (
-                <CheckCircle2 className="h-4 w-4 text-green-500" />
-              )}
-              {step.status === "current" && (
-                <Clock className="h-4 w-4 text-blue-500" />
-              )}
-              {step.status === "pending" && (
-                <AlertCircle className="h-4 w-4 text-gray-400" />
-              )}
+    <div className="space-y-4">
+      {steps.map((step, index) => (
+        <div key={step.id} className="flex items-start gap-4">
+          <div className="flex flex-col items-center">
+            <div className={`p-2 rounded-full ${getStatusColor(step.status)}`}>
+              {step.status === "completed" ? <Check className="h-4 w-4" /> : getStepIcon(step)}
             </div>
-
-            {/* Content */}
-            <div className="flex-1 space-y-1">
-              <div className="flex items-center justify-between">
-                <h4
-                  className={cn(
-                    "font-medium",
-                    step.status === "completed" && "text-green-700",
-                    step.status === "current" && "text-blue-700",
-                    step.status === "pending" && "text-gray-500"
-                  )}
-                >
-                  {step.title}
-                </h4>
-                <span
-                  className={cn(
-                    "text-sm",
-                    step.status === "completed" && "text-green-600",
-                    step.status === "current" && "text-blue-600",
-                    step.status === "pending" && "text-gray-400"
-                  )}
-                >
-                  {formatThaiDate(step.date)}
-                </span>
-              </div>
-              <p
-                className={cn(
-                  "text-sm",
-                  step.status === "completed" && "text-green-600",
-                  step.status === "current" && "text-blue-600",
-                  step.status === "pending" && "text-gray-500"
-                )}
-              >
-                {step.description}
-              </p>
-              {step.id === 3 && step.status === "current" && onReceiveProduct && (
-                <Button
-                  onClick={onReceiveProduct}
-                  className="mt-2 bg-green-600 hover:bg-green-700 text-white"
-                >
-                  ได้รับสินค้าแล้ว
-                </Button>
-              )}
-            </div>
+            {index < steps.length - 1 && (
+              <div className={`w-0.5 h-8 mt-2 ${step.status === "completed" ? "bg-green-200" : "bg-gray-200"}`} />
+            )}
           </div>
-        ))}
-      </div>
+
+          <div className="flex-1 pb-8">
+            <div className="flex items-center justify-between">
+              <h4
+                className={`font-medium ${
+                  step.status === "completed"
+                    ? "text-green-700"
+                    : step.status === "current"
+                      ? "text-blue-700"
+                      : "text-gray-500"
+                }`}
+              >
+                {step.title}
+              </h4>
+              {step.date && <span className="text-xs text-gray-500">{formatDate(step.date)}</span>}
+            </div>
+
+            <p className="text-sm text-gray-600 mt-1">{step.description}</p>
+
+            {/* Show approval summary if data exists */}
+            {step.data && step.data.length > 0 && (
+              <p className="text-xs text-blue-600 mt-2 font-medium bg-blue-50 px-2 py-1 rounded">
+                {getApprovalSummary(step.data)}
+              </p>
+            )}
+
+            {/* Show detailed approval information */}
+            {step.data && step.data.length > 0 && <ApprovalDetails approvals={step.data} />}
+
+            {/* Action buttons for current step */}
+            {step.status === "current" && (
+              <div className="mt-4 flex gap-2">
+                {step.id === 3 && onReceiveProduct && (
+                  <Button onClick={onReceiveProduct} className="bg-green-600 hover:bg-green-700 text-white" size="sm">
+                    ยืนยันรับสินค้า
+                  </Button>
+                )}
+                {step.id === 4 && onReturnProduct && (
+                  <Button onClick={onReturnProduct} className="bg-blue-600 hover:bg-blue-700 text-white" size="sm">
+                    ยืนยันคืนสินค้า
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      ))}
     </div>
-  );
+  )
 } 

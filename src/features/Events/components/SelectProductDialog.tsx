@@ -23,7 +23,7 @@ import { SelectProductVariantDialog } from './SelectProductVariantDialog';
 interface SelectProductDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onSelect: (product: Product, variant: ProductVariant, returnDate: Date | null) => void;
+  onSelect: (product: Product, variant: ProductVariant, returnDate: Date | null, pickupDate: Date | null) => void;
 }
 
 export function SelectProductDialog({
@@ -43,7 +43,7 @@ export function SelectProductDialog({
         setIsLoading(true);
         const data = await productAPI.getProducts();
         setProducts(data);
-      } catch (err) {
+      } catch {
         toast.error('ไม่สามารถดึงข้อมูลสินค้าได้');
       } finally {
         setIsLoading(false);
@@ -64,9 +64,9 @@ export function SelectProductDialog({
     setShowVariantDialog(true);
   };
 
-  const handleVariantSelect = (variant: ProductVariant, returnDate: Date | null) => {
+  const handleVariantSelect = (variant: ProductVariant, returnDate: Date | null, pickupDate: Date | null) => {
     if (selectedProduct) {
-      onSelect(selectedProduct, variant, returnDate);
+      onSelect(selectedProduct, variant, returnDate, pickupDate);
       setSelectedProduct(null);
       setShowVariantDialog(false);
       onOpenChange(false);

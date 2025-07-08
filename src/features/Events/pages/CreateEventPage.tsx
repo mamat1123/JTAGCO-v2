@@ -35,11 +35,12 @@ interface SelectedProduct {
   variant?: {
     id: string;
     sku: string;
-    attributes: Record<string, any>;
+    attributes: Record<string, string | number>;
     price: number;
     stock: number;
   };
   return_date: Date | null;
+  pickup_date: Date | null;
 }
 
 interface TaggedProduct {
@@ -132,7 +133,8 @@ export function CreateEventPage() {
           .map(p => ({
             variant_id: p.variant!.id,
             quantity: p.quantity,
-            return_date: p.return_date ? adjustDate(p.return_date) : null
+            return_date: p.return_date ? adjustDate(p.return_date) : null,
+            pickup_date: p.pickup_date ? adjustDate(p.pickup_date) : null
           })),
         tagged_products: formData.tagged_products.map(tp => ({
           product_id: tp.product_id,
@@ -152,13 +154,13 @@ export function CreateEventPage() {
     return true;
     // const productSubTypes = ["1", "5", "7", "8", "9"];
     // return productSubTypes.includes(formData.sub_type_id);
-  }, [formData.sub_type_id]);
+  }, []);
 
   const handleAddProduct = () => {
     setIsProductDialogOpen(true);
   };
 
-  const handleProductSelect = (product: Product, variant: ProductVariant, returnDate: Date | null) => {
+  const handleProductSelect = (product: Product, variant: ProductVariant, returnDate: Date | null, pickupDate: Date | null) => {
     setSelectedProducts([
       ...selectedProducts,
       {
@@ -173,6 +175,7 @@ export function CreateEventPage() {
           stock: variant.stock,
         },
         return_date: returnDate,
+        pickup_date: pickupDate,
       },
     ]);
   };

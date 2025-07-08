@@ -7,7 +7,7 @@ import {
 } from "@/shared/components/ui/dialog";
 import { useEventDetail, useReceiveShoeVariants } from "../services/eventService";
 import { useEventCheckins, useCreateEventCheckin } from "../services/eventCheckinService";
-import { useEventTimeline, EventTimelineStep } from "../services/eventTimelineService";
+import { useEventTimeline } from "../services/eventTimelineService";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { ImageGallery } from "@/shared/components/ImageGallery";
 import {
@@ -20,9 +20,7 @@ import {
   Camera,
   Plus,
   X,
-  MapPin,
-  ChevronDown,
-  ChevronUp,
+
   Mail,
   Phone,
   Contact,
@@ -36,8 +34,7 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/shared/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { Separator } from "@/shared/components/ui/separator";
-import { TrackingTimeline } from "./TrackingTimeline";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/shared/components/ui/collapsible";
+import { DeliveryTracking } from "./DeliveryTracking";
 import { useProfile } from "@/features/Profile/hooks/useProfile";
 import { UserRole } from "@/shared/types/roles";
 import { DeleteEventModal } from "./DeleteEventModal";
@@ -70,7 +67,7 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [checkinError, setCheckinError] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [isTrackingOpen, setIsTrackingOpen] = useState(false);
+
   const { profile } = useProfile();
 
   const displayEvent = useMemo(() => {
@@ -83,7 +80,6 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
       setShowCheckinForm(false);
       setCheckinDetail("");
       setCheckinImages([]);
-      setIsTrackingOpen(false);
     }
   }, [event]);
 
@@ -122,7 +118,7 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
       setShowCheckinForm(false);
       refetchCheckins();
       toast.success("เช็คอินสำเร็จ");
-    } catch (error) {
+    } catch {
       setCheckinError("ไม่สามารถเช็คอินได้ กรุณาลองใหม่อีกครั้ง");
       toast.error("ไม่สามารถเช็คอินได้");
     } finally {
@@ -136,7 +132,7 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
     try {
       await receiveShoeVariants.mutateAsync(event.id);
       toast.success("รับสินค้าสำเร็จ");
-    } catch (error) {
+    } catch {
       toast.error("ไม่สามารถรับสินค้าได้ กรุณาลองใหม่อีกครั้ง");
     }
   }
@@ -517,59 +513,15 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
                   </Card>
 
 
-                  {/* Event Tracking Collapsible Card */}
-                  {
-                    trackingSteps.length > 0 && (
-                      <Collapsible open={isTrackingOpen} onOpenChange={setIsTrackingOpen}>
-                        <Card className="overflow-hidden border-blue-100 shadow-sm py-4">
-                          <CollapsibleTrigger asChild>
-                            <CardContent className="cursor-pointer hover:bg-blue-50/50 transition-colors">
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                  <div className="p-2 bg-blue-100 rounded-lg">
-                                    <MapPin className="h-5 w-5 text-blue-600" />
-                                  </div>
-                                  <div>
-                                    <h3 className="font-semibold text-blue-800 text-sm md:text-base">สถานะเบิกสินค้า</h3>
-                                  </div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  {isLoadingTimeline ? (
-                                    <Skeleton className="h-6 w-24" />
-                                  ) : (
-                                    <Badge variant="outline" className="text-blue-600 border-blue-200 text-xs md:text-sm">
-                                      {trackingSteps.filter((step: EventTimelineStep) => step.status === "completed").length}/
-                                      {trackingSteps.length} เสร็จสิ้น
-                                    </Badge>
-                                  )}
-                                  {isTrackingOpen ? (
-                                    <ChevronUp className="h-5 w-5 text-blue-600" />
-                                  ) : (
-                                    <ChevronDown className="h-5 w-5 text-blue-600" />
-                                  )}
-                                </div>
-                              </div>
-                            </CardContent>
-                          </CollapsibleTrigger>
-                          <CollapsibleContent>
-                            <div className="border-t border-blue-100">
-                              <CardContent className="p-6 bg-blue-50/30">
-                                {isLoadingTimeline ? (
-                                  <div className="space-y-4">
-                                    <Skeleton className="h-12 w-full" />
-                                    <Skeleton className="h-12 w-full" />
-                                    <Skeleton className="h-12 w-full" />
-                                  </div>
-                                ) : (
-                                  <TrackingTimeline steps={trackingSteps} onReceiveProduct={onReceiveProduct} />
-                                )}
-                              </CardContent>
-                            </div>
-                          </CollapsibleContent>
-                        </Card>
-                      </Collapsible>
-                    )
-                  }
+                  {/* Event Tracking */}
+                  {trackingSteps.length > 0 && (
+                    <DeliveryTracking
+                      eventId={event?.id}
+                      initialSteps={trackingSteps}
+                      isLoadingTimeline={isLoadingTimeline}
+                      onReceiveProduct={onReceiveProduct}
+                    />
+                  )}
 
                   <div className="flex items-center justify-center gap-2">
                     {canDelete && (
