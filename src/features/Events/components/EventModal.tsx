@@ -39,7 +39,7 @@ export function EventModal({
 
   // Group events by user_id
   const groupedEvents = selectedEvents.reduce((acc, event) => {
-    const userId = event.user_id || 'anonymous';
+    const userId = event.userId || 'anonymous';
     if (!acc[userId]) {
       acc[userId] = {
         userFullName: event.userFullName || 'Anonymous',
