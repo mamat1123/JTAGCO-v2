@@ -46,7 +46,7 @@ export interface CalendarEvent {
   scheduled_at_end?: string;
   main_type_id?: number;
   sub_type_id?: number;
-  userId?: string | number;
+  user_id?: string | number;
   eventImages?: string[];
   eventCheckins?: {
     detail: string;

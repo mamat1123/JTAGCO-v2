@@ -115,7 +115,7 @@ export function Calendar({ className }: Omit<CalendarProps, "events">) {
   const events: CalendarEvent[] = React.useMemo(() =>
     backendEvents.map((event) => ({
       id: event.id,
-      userId: event.user_id,
+      user_id: event.user_id,
       title: event.description,
       date: event.scheduled_at,
       startTime: event.test_start_at || undefined,
