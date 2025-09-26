@@ -105,6 +105,7 @@ export interface InactiveCompaniesDto {
   search?: string;
   province?: string;
   branch?: string;
+  user_id?: string;
 }
 
 export interface PaginatedResponse<T> {

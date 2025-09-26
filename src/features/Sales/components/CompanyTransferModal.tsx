@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { Check, ChevronsUpDown } from "lucide-react"
 import { Button } from "@/shared/components/ui/button"
 import {
   Dialog,
@@ -11,10 +10,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/components/ui/dialog"
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/shared/components/ui/command"
-import { Popover, PopoverContent, PopoverTrigger } from "@/shared/components/ui/popover"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select"
 import { toast } from "sonner"
-import { cn } from "@/lib/utils"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -47,12 +44,11 @@ export function CompanyTransferModal({
   onClose
 }: CompanyTransferModalProps) {
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
-  const [selectedProfile, setSelectedProfile] = useState<string | null>(null)
+  const [selectedProfile, setSelectedProfile] = useState<string>("")
   const [isLoading, setIsLoading] = useState(false)
-  const [popoverOpen, setPopoverOpen] = useState(false)
 
   const handleTransfer = async () => {
-    if (!selectedProfile) return
+    if (!selectedProfile || selectedProfile === "") return
 
     setIsLoading(true)
     try {
@@ -103,53 +99,26 @@ export function CompanyTransferModal({
 
             <div className="space-y-4">
               <h3 className="text-lg font-medium">โอนให้</h3>
-              <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
-                <PopoverTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    role="combobox" 
-                    aria-expanded={popoverOpen} 
-                    className="w-full justify-between"
-                  >
-                    {selectedProfile 
-                      ? profiles.find((profile) => profile.id === selectedProfile)?.fullname 
-                      : "เลือกผู้ใช้..."}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                  <Command>
-                    <CommandInput placeholder="ค้นหาผู้ใช้..." />
-                    <CommandList>
-                      <CommandEmpty>ไม่พบผู้ใช้</CommandEmpty>
-                      <CommandGroup>
-                        {profiles
-                          .filter(profile => profile.id !== company.user_id)
-                          .map((profile) => (
-                          <CommandItem
-                            key={profile.id}
-                            onSelect={() => {
-                              setSelectedProfile(profile.id)
-                              setPopoverOpen(false)
-                            }}
-                          >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                selectedProfile === profile.id ? "opacity-100" : "opacity-0"
-                              )}
-                            />
-                            <div className="flex flex-col">
-                              <span>{profile.fullname}</span>
-                              <span className="text-xs text-muted-foreground">{profile.email}</span>
-                            </div>
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
+              <Select 
+                value={selectedProfile} 
+                onValueChange={(value) => setSelectedProfile(value)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="เลือกผู้ใช้..." />
+                </SelectTrigger>
+                <SelectContent className="max-h-[250px] sm:max-h-[300px]">
+                  {profiles
+                    .filter(profile => profile.id !== company.user_id)
+                    .map((profile) => (
+                    <SelectItem key={profile.id} value={profile.id}>
+                      <div className="flex flex-col">
+                        <span>{profile.fullname}</span>
+                        <span className="text-xs text-muted-foreground">{profile.email}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
@@ -162,7 +131,7 @@ export function CompanyTransferModal({
               ยกเลิก
             </Button>
             <Button 
-              disabled={!selectedProfile || isLoading} 
+              disabled={!selectedProfile || selectedProfile === "" || isLoading} 
               onClick={() => setConfirmDialogOpen(true)}
             >
               โอนบริษัท

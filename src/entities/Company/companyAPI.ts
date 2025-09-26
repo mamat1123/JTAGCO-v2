@@ -31,17 +31,24 @@ export const companyAPI = {
 
   getInactiveCompanies: async (params: InactiveCompaniesDto): Promise<PaginatedResponse<InactiveCompany>> => {
     try {
+      const queryParams: any = {
+        page: params.page || 1,
+        limit: params.limit || 10,
+        months: params.months || 3,
+        sortBy: params.sortBy,
+        sortOrder: params.sortOrder,
+        search: params.search,
+        province: params.province,
+        branch: params.branch,
+      };
+
+      // Only add user_id if it exists and is not "all"
+      if (params.user_id && params.user_id !== "all") {
+        queryParams.user_id = params.user_id;
+      }
+
       const response = await api.get<PaginatedResponse<InactiveCompany>>('/companies/inactive', {
-        params: {
-          page: params.page || 1,
-          limit: params.limit || 10,
-          months: params.months || 3,
-          sortBy: params.sortBy,
-          sortOrder: params.sortOrder,
-          search: params.search,
-          province: params.province,
-          branch: params.branch,
-        }
+        params: queryParams
       });
 
       // Validate response data
@@ -58,12 +65,23 @@ export const companyAPI = {
     }
   },
 
-  getInactiveCompanyStats: async (months: number): Promise<InactiveCompanyStats> => {
+  getInactiveCompanyStats: async (params: { months: number; user_id?: string; sortBy?: string; }): Promise<InactiveCompanyStats> => {
     try {
+      const queryParams: any = {
+        months: params.months || 3,
+      };
+
+      // Only add user_id and sortBy if they exist and user_id is not "all"
+      if (params.user_id && params.user_id !== "all") {
+        queryParams.user_id = params.user_id;
+      }
+      
+      if (params.sortBy) {
+        queryParams.sortBy = params.sortBy;
+      }
+
       const response = await api.get<InactiveCompanyStats>('/companies/inactive/stats', {
-        params: {
-          months: months || 3,
-        }
+        params: queryParams
       });
 
       // Validate response data
