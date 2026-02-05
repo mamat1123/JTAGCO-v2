@@ -25,6 +25,17 @@ export interface BackendEvent {
     phone: string;
     contact_name: string;
   };
+  sales_before_vat?: number;
+  business_type?: string;
+  shoe_order_quantity?: number;
+  has_appointment?: boolean;
+  purchase_months?: string[];
+  test_result?: string;
+  test_result_reason?: string;
+  got_job?: string;
+  got_job_reason?: string;
+  problem_type?: string;
+  present_time?: string;
 }
 
 export interface CalendarEvent {
@@ -62,6 +73,18 @@ export interface CalendarEvent {
     phone: string;
     contact_name: string;
   };
+  // Conditional fields
+  sales_before_vat?: number;
+  business_type?: string;
+  shoe_order_quantity?: number;
+  has_appointment?: boolean;
+  purchase_months?: string[];
+  test_result?: string;
+  test_result_reason?: string;
+  got_job?: string;
+  got_job_reason?: string;
+  problem_type?: string;
+  present_time?: string;
 }
 
 export interface QueryEventDto {
@@ -97,6 +120,17 @@ export interface CreateEventDto {
   customer_id: string;
   image_urls: string[];
   products: EventProduct[];
+  sales_before_vat?: number;
+  business_type?: string;
+  shoe_order_quantity?: number;
+  has_appointment?: boolean;
+  purchase_months?: string[];
+  test_result?: string;
+  test_result_reason?: string;
+  got_job?: string;
+  got_job_reason?: string;
+  problem_type?: string;
+  present_time?: string;
 }
 
 export interface UpdateEventDto extends Partial<CreateEventDto> {
