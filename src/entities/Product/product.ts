@@ -24,12 +24,14 @@ export interface Product {
   name: string;
   description?: string;
   variants?: ProductVariant[];
+  priority?: number;
 }
 
 export interface CreateProductDTO {
   type: ProductType;
   name: string;
   description?: string;
+  priority?: number;
 }
 
 export interface CreateProductVariantDTO {
