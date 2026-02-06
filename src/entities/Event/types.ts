@@ -42,7 +42,21 @@ export interface QueryEventParams {
   tagged_product_id?: string;
 }
 
+export interface ProductSelection {
+  product_id: string;
+  name: string;
+  price: number;
+  price_range: string;
+}
+
 export interface EventCheckinDto {
   detail?: string;
   images?: string[];
+  // PRESENT check-in fields
+  product_selections?: ProductSelection[];
+  delivery_duration?: string;
+  purchase_type?: 'monthly' | 'yearly';
+  purchase_months?: string[];
+  competitor_brand?: string;
+  special_requirements?: string;
 }

@@ -14,6 +14,7 @@ export interface ImageUploaderProps {
   bucketName?: string;
   folderPath?: string;
   multiple?: boolean;
+  hasError?: boolean;
 }
 
 interface ImagePreview {
@@ -32,6 +33,7 @@ export function ImageUploader({
   bucketName = 'images',
   folderPath = 'uploads',
   multiple = false,
+  hasError = false,
 }: ImageUploaderProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [imagePreviews, setImagePreviews] = useState<ImagePreview[]>([]);
@@ -126,7 +128,7 @@ export function ImageUploader({
           htmlFor="image-upload"
           className={`relative flex flex-col items-center justify-center w-full min-h-[200px] border-2 border-dashed rounded-lg cursor-pointer bg-background hover:bg-accent/50 transition-colors ${
             isUploading ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
+          } ${hasError ? 'border-red-500 bg-red-50' : ''}`}
         >
           <div className="flex flex-col items-center justify-center w-full h-full p-4">
             {imagePreviews.length > 0 ? (

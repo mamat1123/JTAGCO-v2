@@ -81,11 +81,33 @@ const DayCell: React.FC<{
   );
 };
 
-export function Calendar({ className }: Omit<CalendarProps, "events">) {
-  const [currentDate, setCurrentDate] = React.useState(new Date());
+type Filters = {
+  search: string;
+  status: string;
+  user_id: string;
+  main_type_id: string;
+  sub_type_id: string;
+  tagged_product_id: string;
+};
+
+interface CalendarComponentProps extends Omit<CalendarProps, "events"> {
+  currentDate?: Date;
+  onDateChange?: (date: Date) => void;
+  filters?: Filters;
+  onFilterChange?: (filters: Filters) => void;
+}
+
+export function Calendar({ className, currentDate: controlledDate, onDateChange, filters: externalFilters, onFilterChange }: CalendarComponentProps) {
+  const [internalDate, setInternalDate] = React.useState(new Date());
+  const currentDate = controlledDate ?? internalDate;
+  const setCurrentDate = (date: Date) => {
+    setInternalDate(date);
+    onDateChange?.(date);
+  };
   const [selectedDate, setSelectedDate] = React.useState<Date | null>(null);
   const [selectedEvents, setSelectedEvents] = React.useState<CalendarEvent[]>([]);
-  const [filters, setFilters] = React.useState({
+
+  const [internalFilters, setInternalFilters] = React.useState({
     search: '',
     status: 'all',
     user_id: 'all',
@@ -94,8 +116,14 @@ export function Calendar({ className }: Omit<CalendarProps, "events">) {
     tagged_product_id: 'all'
   });
 
+  const filters = externalFilters !== undefined ? externalFilters : internalFilters;
+
   const handleFilterChange = (newFilters: typeof filters) => {
-    setFilters(newFilters);
+    if (externalFilters !== undefined) {
+      onFilterChange?.(newFilters);
+    } else {
+      setInternalFilters(newFilters);
+    }
   };
 
   const currentYear = currentDate.getFullYear();

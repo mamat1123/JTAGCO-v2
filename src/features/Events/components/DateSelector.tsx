@@ -20,6 +20,7 @@ interface DateSelectorProps {
   };
   onTestDateRangeChange?: (range: { from: Date | undefined; to?: Date | undefined }) => void;
   showTestDateRange?: boolean;
+  minDate?: Date;
 }
 
 export function DateSelector({
@@ -28,6 +29,7 @@ export function DateSelector({
   testDateRange,
   onTestDateRangeChange,
   showTestDateRange = false,
+  minDate,
 }: DateSelectorProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
@@ -53,6 +55,7 @@ export function DateSelector({
               onSelect={(newDate) => newDate && onDateChange(newDate)}
               initialFocus
               locale={th}
+              disabled={minDate ? { before: minDate } : undefined}
             />
           </PopoverContent>
         </Popover>

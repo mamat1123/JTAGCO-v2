@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Pencil, Trash2, GripVertical } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import {
   Table,
@@ -17,9 +17,11 @@ import { EditProductDialog } from './components/EditProductDialog';
 import { DeleteProductDialog } from './components/DeleteProductDialog';
 import { TableSkeleton } from './components/TableSkeleton';
 import { ProductVariants } from './components/ProductVariants';
+import { ProductPriorityDialog } from './components/ProductPriorityDialog';
 
 export default function ProductsPage() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [showPriorityDialog, setShowPriorityDialog] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
@@ -42,7 +44,7 @@ export default function ProductsPage() {
     };
 
     fetchProducts();
-  }, []);
+  }, [showPriorityDialog]);
 
   // Fetch variants when a product is selected
   useEffect(() => {
@@ -146,11 +148,17 @@ export default function ProductsPage() {
       <Toaster position="top-right" richColors />
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">สินค้า</h1>
-        <AddProductDialog
-          isOpen={isCreateDialogOpen}
-          onOpenChange={setIsCreateDialogOpen}
-          onSubmit={handleCreate}
-        />
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setShowPriorityDialog(true)}>
+            <GripVertical className="w-4 h-4 mr-2" />
+            จัดลำดับความสำคัญ
+          </Button>
+          <AddProductDialog
+            isOpen={isCreateDialogOpen}
+            onOpenChange={setIsCreateDialogOpen}
+            onSubmit={handleCreate}
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -233,6 +241,12 @@ export default function ProductsPage() {
         onOpenChange={() => setDeletingProduct(null)}
         onConfirm={handleDelete}
         productName={deletingProduct?.name || ''}
+      />
+
+      <ProductPriorityDialog
+        isOpen={showPriorityDialog}
+        onOpenChange={setShowPriorityDialog}
+        products={products}
       />
     </div>
   );
