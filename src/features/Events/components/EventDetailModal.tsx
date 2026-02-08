@@ -128,8 +128,21 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
     
     setCheckinFormSubmitted(true);
     
-    if (!checkinDetail.trim()) {
+    // Validate detail only for FOUND_PROBLEM
+    if (requireCheckinDetail && !checkinDetail.trim()) {
       setCheckinError("กรุณากรอกรายละเอียดการเช็คอิน");
+      return;
+    }
+
+    // Validate images for specific sub types
+    if (requireCheckinImages && checkinImages.length === 0) {
+      setCheckinError("กรุณาอัปโหลดรูปภาพอย่างน้อย 1 รูป");
+      return;
+    }
+
+    // Validate problem type for FOUND_PROBLEM
+    if (requireProblemType && !checkinDetail.trim()) {
+      setCheckinError("กรุณากรอกรายละเอียดและประเภทปัญหา");
       return;
     }
 
@@ -153,7 +166,7 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
         checkinData.product_selections = productSelections;
         checkinData.delivery_duration = deliveryDuration;
         checkinData.purchase_type = purchaseType;
-        checkinData.purchase_months = purchaseType === 'monthly' ? purchaseMonths : [];
+        checkinData.purchase_months = purchaseMonths;
          checkinData.competitor_brand = competitorBrand;
        }
 
@@ -253,6 +266,30 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
     return SUB_TYPE_THAI_NAMES[displayEvent.subTypeName] || '';
   }, [displayEvent?.subTypeName]);
 
+  // Check-in validation flags based on sub type
+  const requireCheckinImages = useMemo(() => {
+    return [
+      SUB_TYPE_CODES.SHIPPING,
+      SUB_TYPE_CODES.BILLING,
+      SUB_TYPE_CODES.SENT_TEST,
+      SUB_TYPE_CODES.CHANGE_SIZE,
+      SUB_TYPE_CODES.MEASURE,
+      SUB_TYPE_CODES.EXHIBIT_BOOTHS,
+      SUB_TYPE_CODES.FOUND_PROBLEM,
+      SUB_TYPE_CODES.OTHER,
+    ].includes(subTypeCode as any);
+  }, [subTypeCode]);
+
+  const requireCheckinDetail = useMemo(() => {
+    return [
+      SUB_TYPE_CODES.FOUND_PROBLEM,
+    ].includes(subTypeCode as any);
+  }, [subTypeCode]);
+
+  const requireProblemType = useMemo(() => {
+    return subTypeCode === SUB_TYPE_CODES.FOUND_PROBLEM;
+  }, [subTypeCode]);
+
   // Check if selected main type is FIRST_VISIT (เข้าพบครั้งแรก)
   const isFirstVisitMainType = useMemo(() => {
     return displayEvent?.mainTypeName?.includes('เข้าพบครั้งแรก') || false;
@@ -307,10 +344,7 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
 
     const errors: string[] = [];
 
-    // Check images
-    if (checkinImages.length === 0) {
-      errors.push("กรุณาอัปโหลดรูปภาพอย่างน้อย 1 รูป");
-    }
+    // Note: Images validation moved to requireCheckinImages
 
     // Check product selections
     if (productSelections.length === 0) {
@@ -325,7 +359,7 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
       errors.push("กรุณาเลือกประเภทรอบซื้อ");
     }
 
-    if (purchaseType === 'monthly' && purchaseMonths.length === 0) {
+    if (purchaseMonths.length === 0) {
       errors.push("กรุณาเลือกรอบซื้ออย่างน้อย 1 เดือน");
     }
 
@@ -337,7 +371,7 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
       isValid: errors.length === 0,
       errors,
     };
-  }, [showPresentCheckinFields, checkinImages, productSelections, deliveryDuration, purchaseType, purchaseMonths, competitorBrand]);
+  }, [showPresentCheckinFields, productSelections, deliveryDuration, purchaseType, purchaseMonths, competitorBrand]);
 
   return (
     <>
@@ -751,7 +785,7 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
                               setCheckinDetail(e.target.value);
                               setCheckinError(null);
                             }}
-                            className={cn("min-h-[100px]", checkinError && !checkinDetail.trim() && "border-red-500 focus-visible:ring-red-500")}
+                            className={cn("min-h-[100px]", checkinFormSubmitted && requireCheckinDetail && !checkinDetail.trim() && "border-red-500 focus-visible:ring-red-500")}
                           />
 
                           <ImageUploader
@@ -760,7 +794,7 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
                             multiple={true}
                             bucketName="events"
                             folderPath={`${event?.id}/checkins`}
-                            hasError={showPresentCheckinFields && checkinFormSubmitted && checkinImages.length === 0}
+                            hasError={checkinFormSubmitted && requireCheckinImages && checkinImages.length === 0}
                           />
 
                           {/* PRESENT Check-in Fields */}
