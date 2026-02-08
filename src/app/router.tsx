@@ -6,6 +6,7 @@ import { SuperAdminRoute } from '@/features/Auth/SuperAdminRoute';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import DashboardPage from '@/features/Dashboard/DashboardPage';
 import { SaleDashboardPage } from '@/features/Sales/SalesPage';
+import { SalesDashboardPage } from '@/features/Sales/pages/SalesDashboardPage';
 import { CompanyDetails } from "@/features/Sales/pages/CompanyDetailsPage";
 import { EditCompany } from '@/features/Sales/pages/EditCompanyPage';
 import { CreateCompanyPage } from "@/features/Sales/pages/CreateCompanyPage";
@@ -47,6 +48,10 @@ export const router = createBrowserRouter([
       {
         path: '/sales',
         element: <SaleDashboardPage />,
+      },
+      {
+        path: '/sales/dashboard',
+        element: <SalesDashboardPage />,
       },
       {
         path: "/companies",

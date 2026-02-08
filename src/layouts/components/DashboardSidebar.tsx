@@ -46,6 +46,10 @@ const data = {
       isActive: true,
       items: [
         {
+          title: "แดชบอร์ดการขาย",
+          url: "/sales/dashboard",
+        },
+        {
           title: "ส่วนกลาง",
           url: "/sales",
         },
