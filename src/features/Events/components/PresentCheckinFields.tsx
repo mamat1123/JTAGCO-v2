@@ -146,7 +146,7 @@ export function PresentCheckinFields({
         if (!item.price_range) {
           errors.push(`รายการที่ ${index + 1}: กรุณาเลือกช่วงราคา`);
         }
-        if (item.name !== NO_INSOLE_NAME && (!item.price || item.price <= 0)) {
+        if (item.name !== NO_INSOLE_NAME && (item.price === undefined || item.price === null || item.price < 0)) {
           errors.push(`รายการที่ ${index + 1}: กรุณากรอกราคา`);
         }
       });
@@ -160,7 +160,7 @@ export function PresentCheckinFields({
       errors.push("กรุณาเลือกประเภทรอบซื้อ");
     }
 
-    if (purchaseType === "monthly" && purchaseMonths.length === 0) {
+    if (purchaseMonths.length === 0) {
       errors.push("กรุณาเลือกรอบซื้ออย่างน้อย 1 เดือน");
     }
 
@@ -568,8 +568,8 @@ export function PresentCheckinFields({
         </RadioGroup>
       </div>
 
-      {/* Purchase Months - only show if monthly */}
-      {purchaseType === "monthly" && (
+      {/* Purchase Months - show for both monthly and yearly */}
+      {purchaseType && (
         <div className="space-y-2">
           <Label>รอบซื้อ *</Label>
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">

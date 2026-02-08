@@ -20,6 +20,7 @@ interface DateSelectorProps {
   };
   onTestDateRangeChange?: (range: { from: Date | undefined; to?: Date | undefined }) => void;
   showTestDateRange?: boolean;
+  requireTestDateRange?: boolean;
   minDate?: Date;
 }
 
@@ -29,6 +30,7 @@ export function DateSelector({
   testDateRange,
   onTestDateRangeChange,
   showTestDateRange = false,
+  requireTestDateRange = false,
   minDate,
 }: DateSelectorProps) {
   return (
@@ -63,14 +65,15 @@ export function DateSelector({
 
       {showTestDateRange && testDateRange && onTestDateRangeChange && (
         <div className="space-y-2">
-          <Label>ช่วงเวลาทดสอบ</Label>
+          <Label>ช่วงเวลาทดสอบ{requireTestDateRange && ' *'}</Label>
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant={"outline"}
                 className={cn(
                   "w-full sm:w-[300px] justify-start text-left font-normal",
-                  !testDateRange.from && "text-muted-foreground"
+                  !testDateRange.from && "text-muted-foreground",
+                  requireTestDateRange && !testDateRange.from && "border-destructive"
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />

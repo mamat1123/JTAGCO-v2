@@ -22,7 +22,7 @@ import { NO_INSOLE_NAME } from "@/shared/constants/eventSubTypes";
 interface TaggedProduct {
   product_id: string;
   name: string;
-  price: number;
+  price: number | undefined;
 }
 
 interface ProductTagSelectorProps {
@@ -55,10 +55,9 @@ export function ProductTagSelector({
 
   // Validation for shoe + insole requirement
   const validation = React.useMemo(() => {
-    // Check if all products have valid prices (except "ไม่มีแผ่นรองใน")
+    // Check if all products have valid prices (allow 0 or greater)
     const productsWithInvalidPrice = taggedProducts.filter(tp => {
-      if (tp.name === NO_INSOLE_NAME) return false; // Skip price validation for this product
-      return !tp.price || tp.price <= 0;
+      return tp.price === undefined || tp.price === null || tp.price < 0;
     });
 
     const allPricesValid = productsWithInvalidPrice.length === 0;
@@ -121,7 +120,7 @@ export function ProductTagSelector({
     const newTaggedProduct: TaggedProduct = {
       product_id: selectedProductId,
       name: product.name,
-      price: Number(newProductPrice) || 0
+      price: newProductPrice ? Number(newProductPrice) : undefined
     };
 
     onTaggedProductsChange([...taggedProducts, newTaggedProduct]);
@@ -257,13 +256,13 @@ export function ProductTagSelector({
                 <div className="flex items-center gap-2">
                   <Input
                     type="number"
-                    value={taggedProduct.price || ""}
-                    onChange={(e) => handlePriceChange(taggedProduct.product_id, Number(e.target.value) || 0)}
+                    value={taggedProduct.price ?? ""}
+                    onChange={(e) => handlePriceChange(taggedProduct.product_id, e.target.value ? Number(e.target.value) : undefined)}
                     className="w-24"
                     min="0"
                     step="0.01"
                     disabled={isNoInsoleProduct(taggedProduct.product_id)}
-                    aria-invalid={showValidation && !isNoInsoleProduct(taggedProduct.product_id) && (!taggedProduct.price || taggedProduct.price <= 0)}
+                    aria-invalid={showValidation && !isNoInsoleProduct(taggedProduct.product_id) && (taggedProduct.price === undefined || taggedProduct.price === null || (taggedProduct.price !== undefined && taggedProduct.price < 0))}
                   />
                   <span className="text-sm text-muted-foreground">บาท</span>
                   <Button

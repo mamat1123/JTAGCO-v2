@@ -36,9 +36,9 @@ export function CallNewFields({
   };
 
   const isBusinessTypeInvalid = showValidation && !businessType;
-  const isShoeOrderQuantityInvalid = showValidation && (!shoeOrderQuantity || shoeOrderQuantity <= 0);
+  const isShoeOrderQuantityInvalid = showValidation && (shoeOrderQuantity === undefined || shoeOrderQuantity === null || shoeOrderQuantity < 0);
   const isHasAppointmentInvalid = showValidation && hasAppointment === undefined;
-  const isPurchaseMonthsInvalid = showValidation && hasAppointment && purchaseMonths.length === 0;
+  const isPurchaseMonthsInvalid = showValidation && hasAppointment !== undefined && purchaseMonths.length === 0;
 
   return (
     <div className="space-y-4">
@@ -97,7 +97,7 @@ export function CallNewFields({
         )}
       </div>
 
-      {hasAppointment && (
+      {hasAppointment !== undefined && (
         <div className="space-y-2">
           <Label>รอบการสั่งซื้อ</Label>
           <div className={`grid grid-cols-3 sm:grid-cols-4 gap-2 ${isPurchaseMonthsInvalid ? 'p-2 border border-destructive rounded-md' : ''}`}>

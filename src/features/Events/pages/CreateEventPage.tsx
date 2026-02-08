@@ -149,8 +149,14 @@ export function CreateEventPage() {
     return subTypeCode === SUB_TYPE_CODES.TEST_RESULT;
   }, [subTypeCode]);
 
-  const showProblemTypeField = React.useMemo(() => {
-    return subTypeCode === SUB_TYPE_CODES.FOUND_PROBLEM;
+  // Show test date range for SENT_TEST sub type
+  const showTestDateRange = React.useMemo(() => {
+    return subTypeCode === SUB_TYPE_CODES.SENT_TEST;
+  }, [subTypeCode]);
+
+  // Require test date range for SENT_TEST
+  const requireTestDateRange = React.useMemo(() => {
+    return subTypeCode === SUB_TYPE_CODES.SENT_TEST;
   }, [subTypeCode]);
 
   const showPresentTimeField = React.useMemo(() => {
@@ -170,9 +176,9 @@ export function CreateEventPage() {
     return showPresentTimeField || isFirstVisitMainType;
   }, [showPresentTimeField, isFirstVisitMainType]);
 
-  // Description required for specific sub types
+  // Description required for specific sub types (only CALL_OLD now)
   const requireDescription = React.useMemo(() => {
-    return [SUB_TYPE_CODES.CALL_OLD, SUB_TYPE_CODES.FOUND_PROBLEM, SUB_TYPE_CODES.OTHER].includes(subTypeCode as any);
+    return [SUB_TYPE_CODES.CALL_OLD].includes(subTypeCode as any);
   }, [subTypeCode]);
 
   // Shoe + insole requirement for specific sub types (NOT for CALL_NEW_1, CALL_NEW_2)
@@ -198,32 +204,33 @@ export function CreateEventPage() {
     return requiresProductTypes.includes(subTypeCode as any);
   }, [subTypeCode]);
 
-  // Images required for specific sub types (NOT for CALL_NEW_1, CALL_NEW_2)
+  // Images required for specific sub types (NOT for most VISIT types - only checkin required)
   const requireImages = React.useMemo(() => {
     const requiresImageTypes = [
       SUB_TYPE_CODES.QUOTATION_NEW,
       SUB_TYPE_CODES.QUOTATION_OLD,
       SUB_TYPE_CODES.PO_NEW,
       SUB_TYPE_CODES.PO_OLD,
-      SUB_TYPE_CODES.CALL_OLD,
-      SUB_TYPE_CODES.SHIPPING,
-      SUB_TYPE_CODES.BILLING,
+      // Note: Most VISIT types don't require images on create, only on checkin
       SUB_TYPE_CODES.ACCEPTING_CHEQUE,
-      SUB_TYPE_CODES.SENT_TEST,
-      SUB_TYPE_CODES.CHANGE_SIZE,
-      SUB_TYPE_CODES.MEASURE,
       SUB_TYPE_CODES.TEST_RESULT,
       SUB_TYPE_CODES.VISIT_SEND_SAMPLE,
-      SUB_TYPE_CODES.EXHIBIT_BOOTHS,
-      SUB_TYPE_CODES.FOUND_PROBLEM,
-      SUB_TYPE_CODES.OTHER,
     ];
     return requiresImageTypes.includes(subTypeCode as any);
   }, [subTypeCode]);
 
-  // Customer required for VISIT types and OTHER
+  // Customer required for VISIT types, and specific sub types
   const requireCustomer = React.useMemo(() => {
-    return isVisitEvent || subTypeCode === SUB_TYPE_CODES.OTHER;
+    return isVisitEvent || 
+           [
+             SUB_TYPE_CODES.QUOTATION_NEW,
+             SUB_TYPE_CODES.QUOTATION_OLD,
+             SUB_TYPE_CODES.PO_NEW,
+             SUB_TYPE_CODES.PO_OLD,
+             SUB_TYPE_CODES.CALL_OLD,
+             SUB_TYPE_CODES.SHIPPING,
+             SUB_TYPE_CODES.BILLING,
+           ].includes(subTypeCode as any);
   }, [isVisitEvent, subTypeCode]);
 
   // Get min date for calendar (today if visit event, undefined otherwise)
@@ -363,8 +370,8 @@ export function CreateEventPage() {
       }
     }
 
-    // Validate problem type field
-    if (showProblemTypeField && !formData.problem_type) {
+    // Validate test date range for SENT_TEST
+    if (requireTestDateRange && (!testDateRange.from || !testDateRange.to)) {
       hasError = true;
     }
 
@@ -404,10 +411,12 @@ export function CreateEventPage() {
             return_date: p.return_date ? adjustDate(p.return_date) : null,
             pickup_date: p.pickup_date ? adjustDate(p.pickup_date) : null
           })),
-        tagged_products: formData.tagged_products.map(tp => ({
-          product_id: tp.product_id,
-          price: tp.price
-        })),
+        tagged_products: formData.tagged_products
+          .filter(tp => tp.price !== undefined && tp.price !== null)
+          .map(tp => ({
+            product_id: tp.product_id,
+            price: tp.price as number
+          })),
         // Include conditional fields
         sales_before_vat: showSalesBeforeVat ? formData.sales_before_vat : undefined,
         business_type: showCallNewFields ? formData.business_type : undefined,
@@ -418,7 +427,7 @@ export function CreateEventPage() {
         test_result_reason: showTestResultFields && formData.test_result === 'fail' ? formData.test_result_reason : undefined,
         got_job: showTestResultFields && formData.test_result === 'pass' ? formData.got_job : undefined,
         got_job_reason: showTestResultFields && formData.test_result === 'pass' && formData.got_job === 'no' ? formData.got_job_reason : undefined,
-        problem_type: showProblemTypeField ? formData.problem_type : undefined,
+        problem_type: undefined,
         present_time: showTimePicker ? formData.present_time : undefined,
       }
       await createEvent.mutateAsync(body);
@@ -558,7 +567,8 @@ export function CreateEventPage() {
                   test_end_at: range.to || null,
                 }));
               }}
-              showTestDateRange={formData.sub_type_id === "5"}
+              showTestDateRange={showTestDateRange}
+              requireTestDateRange={requireTestDateRange}
               minDate={minDate}
             />
 
@@ -612,14 +622,6 @@ export function CreateEventPage() {
                 onTestResultReasonChange={(value) => setFormData(prev => ({ ...prev, test_result_reason: value }))}
                 onGotJobChange={(value) => setFormData(prev => ({ ...prev, got_job: value }))}
                 onGotJobReasonChange={(value) => setFormData(prev => ({ ...prev, got_job_reason: value }))}
-                showValidation={formSubmitted}
-              />
-            )}
-
-            {showProblemTypeField && (
-              <ProblemTypeField
-                value={formData.problem_type}
-                onChange={(value) => setFormData(prev => ({ ...prev, problem_type: value }))}
                 showValidation={formSubmitted}
               />
             )}
