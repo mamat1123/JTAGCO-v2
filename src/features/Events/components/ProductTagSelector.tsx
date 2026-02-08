@@ -133,7 +133,7 @@ export function ProductTagSelector({
     onTaggedProductsChange(taggedProducts.filter(tp => tp.product_id !== productId));
   };
 
-  const handlePriceChange = (productId: string, price: number) => {
+  const handlePriceChange = (productId: string, price: number | undefined) => {
     onTaggedProductsChange(taggedProducts.map(tp =>
       tp.product_id === productId ? { ...tp, price } : tp
     ));

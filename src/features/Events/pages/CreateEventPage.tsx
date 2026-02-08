@@ -35,7 +35,6 @@ import {
   SalesBeforeVatField,
   CallNewFields,
   TestResultFields,
-  ProblemTypeField,
   PresentTimeField,
 } from "../components/ConditionalFields";
 
@@ -57,7 +56,7 @@ interface SelectedProduct {
 interface TaggedProduct {
   product_id: string;
   name: string;
-  price: number;
+  price: number | undefined;
 }
 
 // Helper function to get sub_type code
