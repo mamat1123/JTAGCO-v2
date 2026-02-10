@@ -14,7 +14,7 @@ import { Badge } from "@/shared/components/ui/badge";
 import { X, AlertCircle, Plus } from "lucide-react";
 import { ProductSelection } from "@/entities/Event/types";
 import { Product, ProductType } from "@/entities/Product/product";
-import { NO_INSOLE_NAME, MONTHS } from "@/shared/constants/eventSubTypes";
+import { MONTHS } from "@/shared/constants/eventSubTypes";
 import { cn } from "@/lib/utils";
 
 const PRICE_RANGES = [
@@ -40,7 +40,7 @@ interface ProductSelectionItem {
   id: string;
   product_id: string;
   name: string;
-  price: number;
+  price: number | null;
   price_range: string;
 }
 
@@ -91,27 +91,37 @@ export function PresentCheckinFields({
   // Initialize from props
   React.useEffect(() => {
     if (productSelections.length > 0 && selections.length === 0) {
-      const items: ProductSelectionItem[] = productSelections.map((ps) => ({
-        id: Math.random().toString(36).substr(2, 9),
-        product_id: ps.product_id,
-        name: ps.name,
-        price: ps.price,
-        price_range: ps.price_range,
-      }));
+      const items: ProductSelectionItem[] = productSelections.map((ps) => {
+        const product = products.find((p) => p.id === ps.product_id);
+        const isInsole = product?.type === ProductType.INSOLE;
+        return {
+          id: Math.random().toString(36).substr(2, 9),
+          product_id: ps.product_id,
+          name: ps.name,
+          price: isInsole ? (ps.price ?? 0) : ps.price,
+          price_range: ps.price_range,
+        };
+      });
       setSelections(items);
     }
-  }, [productSelections]);
+  }, [productSelections, products]);
 
   // Notify parent about changes
   React.useEffect(() => {
     const newSelections: ProductSelection[] = selections.map((item) => ({
       product_id: item.product_id,
       name: item.name,
-      price: item.price,
+      price: item.price ?? 0,
       price_range: item.price_range,
     }));
     onProductSelectionsChange?.(newSelections);
   }, [selections]);
+
+  // Helper function to check if product is insole
+  const isInsoleProduct = (item: ProductSelectionItem): boolean => {
+    const product = products.find((p) => p.id === item.product_id);
+    return product?.type === ProductType.INSOLE;
+  };
 
   // Validation
   const validation = React.useMemo(() => {
@@ -143,10 +153,11 @@ export function PresentCheckinFields({
 
       // Check each selection has required fields
       selections.forEach((item, index) => {
-        if (!item.price_range) {
+        // Price range not required for insole
+        if (!item.price_range && !isInsoleProduct(item)) {
           errors.push(`รายการที่ ${index + 1}: กรุณาเลือกช่วงราคา`);
         }
-        if (item.name !== NO_INSOLE_NAME && (item.price === undefined || item.price === null || item.price < 0)) {
+        if (!isInsoleProduct(item) && (item.price === null || item.price === undefined || item.price < 0)) {
           errors.push(`รายการที่ ${index + 1}: กรุณากรอกราคา`);
         }
       });
@@ -180,20 +191,23 @@ export function PresentCheckinFields({
     purchaseMonths,
     competitorBrand,
     products,
+    isInsoleProduct,
   ]);
 
   const handleAddProduct = () => {
-    if (!selectedProductId || !newProductPriceRange) return;
-
     const product = products.find((p) => p.id === selectedProductId);
     if (!product) return;
+    
+    // Price range not required for insole
+    const isInsole = product.type === ProductType.INSOLE;
+    if (!selectedProductId || (!newProductPriceRange && !isInsole)) return;
 
     const newItem: ProductSelectionItem = {
       id: Math.random().toString(36).substr(2, 9),
       product_id: selectedProductId,
       name: product.name,
-      price: product.name === NO_INSOLE_NAME ? 0 : Number(newProductPrice) || 0,
-      price_range: newProductPriceRange,
+      price: isInsole ? 0 : (newProductPrice ? Number(newProductPrice) : null),
+      price_range: isInsole ? "" : newProductPriceRange,
     };
 
     setSelections([...selections, newItem]);
@@ -216,16 +230,12 @@ export function PresentCheckinFields({
     );
   };
 
-  const isNoInsoleProduct = (item: ProductSelectionItem): boolean => {
-    return item.name === NO_INSOLE_NAME;
-  };
-
   const selectedProductIds = selections.map((s) => s.product_id);
   const availableProducts = products.filter(
     (p) => !selectedProductIds.includes(p.id),
   );
-  const isSelectedNoInsole =
-    products.find((p) => p.id === selectedProductId)?.name === NO_INSOLE_NAME;
+  const isSelectedInsole =
+    products.find((p) => p.id === selectedProductId)?.type === ProductType.INSOLE;
 
   // View mode render
   if (!isEditing) {
@@ -236,26 +246,32 @@ export function PresentCheckinFields({
           <div className="space-y-4">
             <Label className="text-base">สินค้าที่แนะนำ</Label>
             <div className="space-y-3">
-              {productSelections.map((selection, index) => (
-                <div
-                  key={`${selection.product_id}-${index}`}
-                  className="p-4 border rounded-lg bg-muted/50"
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">{selection.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        ราคา: {selection.price.toLocaleString()} บาท
-                      </p>
+              {productSelections.map((selection, index) => {
+                const product = products.find((p) => p.id === selection.product_id);
+                const isInsole = product?.type === ProductType.INSOLE;
+                return (
+                  <div
+                    key={`${selection.product_id}-${index}`}
+                    className="p-4 border rounded-lg bg-muted/50"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">{selection.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          ราคา: {selection.price?.toLocaleString() ?? "-"} บาท
+                        </p>
+                      </div>
+                      {!isInsole && (
+                        <Badge variant="secondary">
+                          {PRICE_RANGES.find(
+                            (r) => r.value === selection.price_range,
+                          )?.label || selection.price_range}
+                        </Badge>
+                      )}
                     </div>
-                    <Badge variant="secondary">
-                      {PRICE_RANGES.find(
-                        (r) => r.value === selection.price_range,
-                      )?.label || selection.price_range}
-                    </Badge>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
@@ -282,7 +298,7 @@ export function PresentCheckinFields({
         )}
 
         {/* Purchase Months */}
-        {purchaseType === "monthly" && purchaseMonths.length > 0 && (
+        {purchaseType && purchaseMonths.length > 0 && (
           <div className="space-y-2">
             <Label>รอบซื้อ</Label>
             <div className="flex flex-wrap gap-1">
@@ -340,13 +356,6 @@ export function PresentCheckinFields({
       <div className="space-y-4">
         <Label className="text-base">สินค้าที่แนะนำ *</Label>
 
-        {/* Product List */}
-        {selections.length === 0 && showValidation && (
-          <div className="p-4 border border-destructive rounded-lg bg-destructive/5 text-destructive text-sm">
-            กรุณาเพิ่มสินค้าอย่างน้อย 1 รายการ (รองเท้าและแผ่นรองใน)
-          </div>
-        )}
-
         <div className="space-y-4">
           {selections.map((item) => (
             <div
@@ -354,9 +363,9 @@ export function PresentCheckinFields({
               className={cn(
                 "p-4 border rounded-lg space-y-3",
                 showValidation &&
-                  (!item.price_range ||
-                    (!isNoInsoleProduct(item) &&
-                      (!item.price || item.price <= 0))) &&
+                  ((!isInsoleProduct(item) && !item.price_range) ||
+                    (!isInsoleProduct(item) &&
+                      (item.price === null || item.price === undefined || item.price < 0))) &&
                   "border-destructive bg-destructive/5",
               )}
             >
@@ -382,53 +391,59 @@ export function PresentCheckinFields({
                   <div className="flex items-center gap-2">
                     <Input
                       type="number"
-                      value={item.price || ""}
-                      onChange={(e) =>
-                        handlePriceChange(item.id, Number(e.target.value) || 0)
-                      }
+                      value={item.price ?? ""}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === "") {
+                          handlePriceChange(item.id, null as any);
+                        } else {
+                          handlePriceChange(item.id, Number(value));
+                        }
+                      }}
                       className={cn(
                         "flex-1",
                         showValidation &&
-                          !isNoInsoleProduct(item) &&
-                          (!item.price || item.price <= 0) &&
+                          !isInsoleProduct(item) &&
+                          (item.price === null || item.price === undefined || item.price < 0) &&
                           "border-destructive",
                       )}
                       min="0"
                       step="0.01"
-                      disabled={isNoInsoleProduct(item)}
                       placeholder="0"
                     />
                     <span className="text-sm text-muted-foreground">บาท</span>
                   </div>
                 </div>
 
-                {/* Price Range */}
-                <div className="space-y-1">
-                  <Label className="text-xs">ช่วงราคา *</Label>
-                  <Select
-                    value={item.price_range}
-                    onValueChange={(value) =>
-                      handlePriceRangeChange(item.id, value)
-                    }
-                  >
-                    <SelectTrigger
-                      className={cn(
-                        showValidation &&
-                          !item.price_range &&
-                          "border-destructive",
-                      )}
+                {/* Price Range - Hidden for insole */}
+                {!isInsoleProduct(item) && (
+                  <div className="space-y-1">
+                    <Label className="text-xs">ช่วงราคา *</Label>
+                    <Select
+                      value={item.price_range}
+                      onValueChange={(value) =>
+                        handlePriceRangeChange(item.id, value)
+                      }
                     >
-                      <SelectValue placeholder="เลือกช่วงราคา" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {PRICE_RANGES.map((range) => (
-                        <SelectItem key={range.value} value={range.value}>
-                          {range.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                      <SelectTrigger
+                        className={cn(
+                          showValidation &&
+                            !item.price_range &&
+                            "border-destructive",
+                        )}
+                      >
+                        <SelectValue placeholder="เลือกช่วงราคา" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {PRICE_RANGES.map((range) => (
+                          <SelectItem key={range.value} value={range.value}>
+                            {range.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
             </div>
           ))}
@@ -443,10 +458,10 @@ export function PresentCheckinFields({
               value={selectedProductId}
               onValueChange={(value) => {
                 setSelectedProductId(value);
-                if (
-                  products.find((p) => p.id === value)?.name === NO_INSOLE_NAME
-                ) {
+                const selectedProduct = products.find((p) => p.id === value);
+                if (selectedProduct?.type === ProductType.INSOLE) {
                   setNewProductPrice("0");
+                  setNewProductPriceRange("");
                 } else {
                   setNewProductPrice("");
                 }
@@ -472,25 +487,27 @@ export function PresentCheckinFields({
               onChange={(e) => setNewProductPrice(e.target.value)}
               min="0"
               step="0.01"
-              disabled={isSelectedNoInsole}
+              disabled={isSelectedInsole}
             />
 
-            {/* Price Range */}
-            <Select
-              value={newProductPriceRange}
-              onValueChange={setNewProductPriceRange}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="ช่วงราคา" />
-              </SelectTrigger>
-              <SelectContent>
-                {PRICE_RANGES.map((range) => (
-                  <SelectItem key={range.value} value={range.value}>
-                    {range.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {/* Price Range - Hidden for insole */}
+            {!isSelectedInsole && (
+              <Select
+                value={newProductPriceRange}
+                onValueChange={setNewProductPriceRange}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="ช่วงราคา" />
+                </SelectTrigger>
+                <SelectContent>
+                  {PRICE_RANGES.map((range) => (
+                    <SelectItem key={range.value} value={range.value}>
+                      {range.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           <Button
@@ -498,7 +515,7 @@ export function PresentCheckinFields({
             variant="outline"
             size="sm"
             onClick={handleAddProduct}
-            disabled={!selectedProductId || !newProductPriceRange}
+            disabled={!selectedProductId || (!newProductPriceRange && !isSelectedInsole)}
             className="w-full"
           >
             <Plus className="h-4 w-4 mr-1" />
@@ -572,7 +589,12 @@ export function PresentCheckinFields({
       {purchaseType && (
         <div className="space-y-2">
           <Label>รอบซื้อ *</Label>
-          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+          <div className={cn(
+            "grid grid-cols-3 sm:grid-cols-4 gap-2 p-2 rounded-lg border-2",
+            showValidation && purchaseMonths.length === 0
+              ? "border-destructive bg-destructive/5"
+              : "border-transparent"
+          )}>
             {MONTHS.map((month) => (
               <label
                 key={month.value}
@@ -601,15 +623,10 @@ export function PresentCheckinFields({
                   }}
                 />
                 <span className="text-sm">{month.label}</span>
-              </label>
-            ))}
-          </div>
-          {showValidation && purchaseMonths.length === 0 && (
-            <p className="text-sm text-destructive">
-              กรุณาเลือกรอบซื้ออย่างน้อย 1 เดือน
-            </p>
-          )}
+            </label>
+          ))}
         </div>
+      </div>
       )}
 
       {/* Competitor Brand */}

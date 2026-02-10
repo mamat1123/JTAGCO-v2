@@ -50,6 +50,7 @@ import { formatThaiDate } from "@/shared/utils/dateUtils";
 import { MONTHS, PROBLEM_TYPES, SUB_TYPE_CODES, SUB_TYPE_THAI_NAMES } from "@/shared/constants/eventSubTypes";
 import { PresentCheckinFields } from "./PresentCheckinFields";
 import { ProductSelection } from "@/entities/Event/types";
+import { ProductType } from "@/entities/Product/product";
 import { useProducts } from "@/features/Settings/Products/hooks/useProducts";
 
 interface EventCheckin {
@@ -147,8 +148,8 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
     }
 
     // Validate PRESENT check-in fields if applicable
+    // Note: PRESENT field errors are shown by PresentCheckinFields component, not here
     if (showPresentCheckinFields && !validatePresentCheckinFields.isValid) {
-      setCheckinError(validatePresentCheckinFields.errors.join(", "));
       return;
     }
 
@@ -271,6 +272,7 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
     return [
       SUB_TYPE_CODES.SHIPPING,
       SUB_TYPE_CODES.BILLING,
+      SUB_TYPE_CODES.ACCEPTING_CHEQUE,
       SUB_TYPE_CODES.SENT_TEST,
       SUB_TYPE_CODES.CHANGE_SIZE,
       SUB_TYPE_CODES.MEASURE,
@@ -344,11 +346,29 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
 
     const errors: string[] = [];
 
-    // Note: Images validation moved to requireCheckinImages
+    // Check images for PRESENT check-in
+    if (!checkinImages || checkinImages.length === 0) {
+      errors.push("กรุณาอัปโหลดรูปภาพอย่างน้อย 1 รูป");
+    }
 
     // Check product selections
     if (productSelections.length === 0) {
       errors.push("กรุณาเพิ่มสินค้าอย่างน้อย 1 รายการ");
+    } else {
+      // Check for shoe and insole
+      const hasShoe = productSelections.some((item) => {
+        const product = products.find((p) => p.id === item.product_id);
+        return product?.type === ProductType.SHOE;
+      });
+
+      const hasInsole = productSelections.some((item) => {
+        const product = products.find((p) => p.id === item.product_id);
+        return product?.type === ProductType.INSOLE;
+      });
+
+      if (!hasShoe || !hasInsole) {
+        errors.push("กรุณาเลือกรองเท้าและแผ่นรองใน");
+      }
     }
 
     if (!deliveryDuration) {
@@ -371,8 +391,11 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
       isValid: errors.length === 0,
       errors,
     };
-  }, [showPresentCheckinFields, productSelections, deliveryDuration, purchaseType, purchaseMonths, competitorBrand]);
+  }, [showPresentCheckinFields, productSelections, deliveryDuration, purchaseType, purchaseMonths, competitorBrand, products, checkinImages]);
 
+  useEffect(() => {
+    console.log("PRESENT Check-in Validation:", showCallNewFields, displayEvent);
+  }, [showCallNewFields, displayEvent]);
   return (
     <>
       <Dialog open={!!event} onOpenChange={(open) => {
@@ -794,7 +817,7 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
                             multiple={true}
                             bucketName="events"
                             folderPath={`${event?.id}/checkins`}
-                            hasError={checkinFormSubmitted && requireCheckinImages && checkinImages.length === 0}
+                            hasError={checkinFormSubmitted && (requireCheckinImages || showPresentCheckinFields) && checkinImages.length === 0}
                           />
 
                           {/* PRESENT Check-in Fields */}
@@ -889,7 +912,7 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
                                     )}
                                     
                                     {/* PRESENT Check-in Fields - Read Only */}
-                                    {(checkin.product_selections?.length || checkin.delivery_duration || checkin.purchase_type || checkin.competitor_brand) && (
+                                    {(checkin.product_selections?.length || checkin.delivery_duration || checkin.purchase_type || checkin.purchase_months?.length || checkin.competitor_brand) && (
                                       <div className="pt-4 border-t border-green-200 mt-4">
                                         <h5 className="font-medium text-sm mb-3 flex items-center gap-2 text-green-800">
                                           <FileText className="h-4 w-4" />

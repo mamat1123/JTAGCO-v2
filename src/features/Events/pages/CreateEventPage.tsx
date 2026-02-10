@@ -211,7 +211,6 @@ export function CreateEventPage() {
       SUB_TYPE_CODES.PO_NEW,
       SUB_TYPE_CODES.PO_OLD,
       // Note: Most VISIT types don't require images on create, only on checkin
-      SUB_TYPE_CODES.ACCEPTING_CHEQUE,
       SUB_TYPE_CODES.TEST_RESULT,
       SUB_TYPE_CODES.VISIT_SEND_SAMPLE,
     ];
@@ -421,7 +420,7 @@ export function CreateEventPage() {
         business_type: showCallNewFields ? formData.business_type : undefined,
         shoe_order_quantity: showCallNewFields ? formData.shoe_order_quantity : undefined,
         has_appointment: showCallNewFields ? formData.has_appointment : undefined,
-        purchase_months: showCallNewFields && formData.has_appointment ? formData.purchase_months : undefined,
+        purchase_months: showCallNewFields ? formData.purchase_months : undefined,
         test_result: showTestResultFields ? formData.test_result : undefined,
         test_result_reason: showTestResultFields && formData.test_result === 'fail' ? formData.test_result_reason : undefined,
         got_job: showTestResultFields && formData.test_result === 'pass' ? formData.got_job : undefined,
