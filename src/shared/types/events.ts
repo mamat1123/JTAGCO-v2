@@ -34,7 +34,7 @@ export interface BackendEvent {
   test_result_reason?: string;
   got_job?: string;
   got_job_reason?: string;
-  problem_type?: string;
+  problem_types?: string[];
   present_time?: string;
 }
 
@@ -83,7 +83,7 @@ export interface CalendarEvent {
   test_result_reason?: string;
   got_job?: string;
   got_job_reason?: string;
-  problem_type?: string;
+  problem_types?: string[];
   present_time?: string;
 }
 
@@ -129,7 +129,7 @@ export interface CreateEventDto {
   test_result_reason?: string;
   got_job?: string;
   got_job_reason?: string;
-  problem_type?: string;
+  problem_types?: string[];
   present_time?: string;
 }
 

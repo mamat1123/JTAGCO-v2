@@ -43,7 +43,7 @@ export default function RegisterPage() {
         role: formData.role,
         fullname: formData.fullname,
       });
-    } catch (err) {
+    } catch {
       setError('การลงทะเบียนล้มเหลว');
     } finally {
       setIsLoading(false);

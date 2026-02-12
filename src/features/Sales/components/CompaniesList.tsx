@@ -83,6 +83,7 @@ export function CompaniesList() {
     };
 
     fetchCompanies();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, filters, profile?.role, profile?.user_id]);
 
   const handleRowClick = (companyId: string) => {

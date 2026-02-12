@@ -49,6 +49,8 @@ import { ImageUploader } from "@/shared/components/ImageUploader";
 import { formatThaiDate } from "@/shared/utils/dateUtils";
 import { MONTHS, PROBLEM_TYPES, SUB_TYPE_CODES, SUB_TYPE_THAI_NAMES } from "@/shared/constants/eventSubTypes";
 import { PresentCheckinFields } from "./PresentCheckinFields";
+import { TestResultFields } from "./ConditionalFields/TestResultFields";
+import { ProblemTypeField } from "./ConditionalFields/ProblemTypeField";
 import { ProductSelection } from "@/entities/Event/types";
 import { ProductType } from "@/entities/Product/product";
 import { useProducts } from "@/features/Settings/Products/hooks/useProducts";
@@ -66,6 +68,13 @@ interface EventCheckin {
   purchase_months?: string[];
   competitor_brand?: string;
   special_requirements?: string;
+  // TEST_RESULT check-in fields
+  test_result?: string;
+  test_result_reason?: string;
+  got_job?: string;
+  got_job_reason?: string;
+  // FOUND_PROBLEM check-in fields
+  problem_types?: string[];
 }
 
 interface EventDetailModalProps {
@@ -96,6 +105,15 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
   const [purchaseMonths, setPurchaseMonths] = useState<string[]>([]);
   const [competitorBrand, setCompetitorBrand] = useState("");
   const [specialRequirements, setSpecialRequirements] = useState("");
+
+  // TEST_RESULT check-in fields
+  const [testResult, setTestResult] = useState("");
+  const [testResultReason, setTestResultReason] = useState("");
+  const [gotJob, setGotJob] = useState("");
+  const [gotJobReason, setGotJobReason] = useState("");
+
+  // FOUND_PROBLEM check-in fields
+  const [problemTypes, setProblemTypes] = useState<string[]>([]);
 
   const { profile } = useProfile();
 
@@ -141,9 +159,9 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
       return;
     }
 
-    // Validate problem type for FOUND_PROBLEM
-    if (requireProblemType && !checkinDetail.trim()) {
-      setCheckinError("กรุณากรอกรายละเอียดและประเภทปัญหา");
+    // Validate problem types for FOUND_PROBLEM
+    if (requireProblemType && problemTypes.length === 0) {
+      setCheckinError("กรุณาเลือกประเภทปัญหาอย่างน้อย 1 รายการ");
       return;
     }
 
@@ -153,11 +171,20 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
       return;
     }
 
+    // Validate TEST_RESULT check-in fields if applicable
+    if (showTestResultCheckinFields) {
+      const validation = validateTestResultCheckinFields;
+      if (!validation.isValid) {
+        setCheckinError(validation.errors[0]);
+        return;
+      }
+    }
+
     setIsSubmitting(true);
     setCheckinError(null);
 
     try {
-      const checkinData: any = {
+      const checkinData: Record<string, unknown> = {
         detail: checkinDetail,
         images: checkinImages
       };
@@ -168,8 +195,21 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
         checkinData.delivery_duration = deliveryDuration;
         checkinData.purchase_type = purchaseType;
         checkinData.purchase_months = purchaseMonths;
-         checkinData.competitor_brand = competitorBrand;
-       }
+        checkinData.competitor_brand = competitorBrand;
+      }
+
+      // Add TEST_RESULT check-in fields if applicable
+      if (showTestResultCheckinFields) {
+        checkinData.test_result = testResult;
+        checkinData.test_result_reason = testResultReason;
+        checkinData.got_job = gotJob;
+        checkinData.got_job_reason = gotJobReason;
+      }
+
+      // Add FOUND_PROBLEM check-in fields if applicable
+      if (requireProblemType) {
+        checkinData.problem_types = problemTypes;
+      }
 
 
       await createCheckin.mutateAsync({
@@ -182,11 +222,18 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
       setCheckinImages([]);
       setProductSelections([]);
       setDeliveryDuration("");
-       setPurchaseType(undefined);
-       setPurchaseMonths([]);
-       setCompetitorBrand("");
-       setCheckinFormSubmitted(false);
-       setShowCheckinForm(false);
+      setPurchaseType(undefined);
+      setPurchaseMonths([]);
+      setCompetitorBrand("");
+      // Reset TEST_RESULT fields
+      setTestResult("");
+      setTestResultReason("");
+      setGotJob("");
+      setGotJobReason("");
+      // Reset FOUND_PROBLEM fields
+      setProblemTypes([]);
+      setCheckinFormSubmitted(false);
+      setShowCheckinForm(false);
       refetchCheckins();
       toast.success("เช็คอินสำเร็จ");
     } catch {
@@ -269,7 +316,7 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
 
   // Check-in validation flags based on sub type
   const requireCheckinImages = useMemo(() => {
-    return [
+    return ([
       SUB_TYPE_CODES.SHIPPING,
       SUB_TYPE_CODES.BILLING,
       SUB_TYPE_CODES.ACCEPTING_CHEQUE,
@@ -279,13 +326,14 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
       SUB_TYPE_CODES.EXHIBIT_BOOTHS,
       SUB_TYPE_CODES.FOUND_PROBLEM,
       SUB_TYPE_CODES.OTHER,
-    ].includes(subTypeCode as any);
+      SUB_TYPE_CODES.TEST_RESULT,
+    ] as string[]).includes(subTypeCode);
   }, [subTypeCode]);
 
   const requireCheckinDetail = useMemo(() => {
-    return [
+    return ([
       SUB_TYPE_CODES.FOUND_PROBLEM,
-    ].includes(subTypeCode as any);
+    ] as string[]).includes(subTypeCode);
   }, [subTypeCode]);
 
   const requireProblemType = useMemo(() => {
@@ -299,11 +347,11 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
 
   // Conditional field visibility flags
   const showSalesBeforeVat = useMemo(() => {
-    return [SUB_TYPE_CODES.PO_NEW, SUB_TYPE_CODES.PO_OLD].includes(subTypeCode as any);
+    return ([SUB_TYPE_CODES.PO_NEW, SUB_TYPE_CODES.PO_OLD] as string[]).includes(subTypeCode);
   }, [subTypeCode]);
 
   const showCallNewFields = useMemo(() => {
-    return [SUB_TYPE_CODES.CALL_NEW_1, SUB_TYPE_CODES.CALL_NEW_2].includes(subTypeCode as any);
+    return ([SUB_TYPE_CODES.CALL_NEW_1, SUB_TYPE_CODES.CALL_NEW_2] as string[]).includes(subTypeCode);
   }, [subTypeCode]);
 
   const showTestResultFields = useMemo(() => {
@@ -328,13 +376,18 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
     return showPresentTimeField || isFirstVisitMainType;
   }, [showPresentTimeField, isFirstVisitMainType]);
 
+  // Show TEST_RESULT check-in fields for TEST_RESULT sub_type
+  const showTestResultCheckinFields = useMemo(() => {
+    return subTypeCode === SUB_TYPE_CODES.TEST_RESULT;
+  }, [subTypeCode]);
+
   // Check if conditional fields section should be shown
   const showConditionalFieldsSection = useMemo(() => {
     const hasSalesBeforeVat = showSalesBeforeVat && displayEvent?.sales_before_vat;
     const hasCallNewFields = showCallNewFields && !!(displayEvent?.business_type || displayEvent?.shoe_order_quantity ||
       displayEvent?.has_appointment !== undefined || displayEvent?.purchase_months?.length);
     const hasTestResultFields = showTestResultFields && !!(displayEvent?.test_result || displayEvent?.got_job);
-    const hasProblemTypeField = showProblemTypeField && displayEvent?.problem_type;
+    const hasProblemTypeField = showProblemTypeField && displayEvent?.problem_types?.length;
     const hasPresentTimeField = showTimePicker && displayEvent?.present_time;
     
     return hasSalesBeforeVat || hasCallNewFields || hasTestResultFields || hasProblemTypeField || hasPresentTimeField;
@@ -393,9 +446,48 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
     };
   }, [showPresentCheckinFields, productSelections, deliveryDuration, purchaseType, purchaseMonths, competitorBrand, products, checkinImages]);
 
+  // Validate TEST_RESULT check-in fields
+  const validateTestResultCheckinFields = useMemo(() => {
+    if (!showTestResultCheckinFields) return { isValid: true, errors: [] };
+
+    const errors: string[] = [];
+
+    // Test result is locked to "pass" (ผ่าน) - always checked
+    if (!testResult) {
+      errors.push("กรุณาระบุผลเทส");
+    }
+
+    // Only require got_job when test_result is "pass"
+    if (testResult === 'pass' && !gotJob) {
+      errors.push("กรุณาเลือกว่าได้งานหรือไม่");
+    }
+
+    // If got_job is "no", require got_job_reason
+    if (gotJob === 'no' && !gotJobReason.trim()) {
+      errors.push("กรุณากรอกเหตุผลที่ไม่ได้งาน");
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors,
+    };
+  }, [showTestResultCheckinFields, testResult, gotJob, gotJobReason]);
+
   useEffect(() => {
     console.log("PRESENT Check-in Validation:", showCallNewFields, displayEvent);
   }, [showCallNewFields, displayEvent]);
+
+  // Auto-set test result to "pass" when check-in form is shown for TEST_RESULT sub-type
+  useEffect(() => {
+    if (showCheckinForm && showTestResultCheckinFields) {
+      setTestResult('pass');
+    } else {
+      setTestResult('');
+      setTestResultReason('');
+      setGotJob('');
+      setGotJobReason('');
+    }
+  }, [showCheckinForm, showTestResultCheckinFields]);
   return (
     <>
       <Dialog open={!!event} onOpenChange={(open) => {
@@ -684,8 +776,8 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
                                 </div>
                               )}
 
-                              {/* Problem Type */}
-                              {showProblemTypeField && displayEvent.problem_type && (
+                              {/* Problem Types */}
+                              {showProblemTypeField && displayEvent.problem_types && displayEvent.problem_types.length > 0 && (
                                 <div className="flex items-center gap-3">
                                   <div className="p-2 bg-amber-100 rounded-lg">
                                     <AlertTriangle className="h-4 w-4 text-amber-600" />
@@ -693,7 +785,7 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
                                   <div>
                                     <p className="text-xs text-gray-500">ประเภทปัญหา</p>
                                     <p className="text-sm font-medium">
-                                      {PROBLEM_TYPES.find(p => p.value === displayEvent.problem_type)?.label || displayEvent.problem_type}
+                                      {displayEvent.problem_types.map(pt => PROBLEM_TYPES.find(p => p.value === pt)?.label || pt).join(', ')}
                                     </p>
                                   </div>
                                 </div>
@@ -848,6 +940,42 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
                             </div>
                           )}
 
+                          {/* TEST_RESULT Check-in Fields */}
+                          {showTestResultCheckinFields && (
+                            <div className="border-t pt-4 mt-4">
+                              <h4 className="font-medium text-sm md:text-base mb-4 flex items-center gap-2">
+                                <FileText className="h-4 w-4 text-indigo-600" />
+                                ข้อมูลผลเทส
+                              </h4>
+                              <TestResultFields
+                                testResult={testResult}
+                                testResultReason={testResultReason}
+                                gotJob={gotJob}
+                                gotJobReason={gotJobReason}
+                                onTestResultChange={setTestResult}
+                                onTestResultReasonChange={setTestResultReason}
+                                onGotJobChange={setGotJob}
+                                onGotJobReasonChange={setGotJobReason}
+                                showValidation={checkinFormSubmitted}
+                              />
+                            </div>
+                          )}
+
+                          {/* FOUND_PROBLEM Check-in Fields */}
+                          {requireProblemType && (
+                            <div className="border-t pt-4 mt-4">
+                              <h4 className="font-medium text-sm md:text-base mb-4 flex items-center gap-2">
+                                <AlertTriangle className="h-4 w-4 text-amber-600" />
+                                ข้อมูลปัญหา
+                              </h4>
+                              <ProblemTypeField
+                                value={problemTypes}
+                                onChange={setProblemTypes}
+                                showValidation={checkinFormSubmitted}
+                              />
+                            </div>
+                          )}
+
                           <Button className="w-full" onClick={handleCheckin} disabled={isSubmitting}>
                             {isSubmitting ? "กำลังเช็คอิน..." : "บันทึกการเช็คอิน"}
                           </Button>
@@ -879,60 +1007,126 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
                       {checkins && checkins.length > 0 && (
                         <div className="space-y-4">
                           <Separator />
-                          <h4 className="font-semibold text-lg text-sm md:text-lg">ประวัติการเช็คอิน</h4>
+                          <h4 className="font-semibold text-lg">ประวัติการเช็คอิน</h4>
                           <div className="space-y-3">
                             {checkins.map((checkin: EventCheckin, index: number) => (
-                              <div
-                                key={checkin.id}
-                                className="p-4 rounded-lg border bg-gradient-to-r from-green-50 to-emerald-50"
-                              >
-                                <div className="flex gap-4">
-                                  <div className="flex-shrink-0">
-                                    <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                                      <CheckCircle2 className="h-5 w-5 text-green-600" />
+                              <Card key={checkin.id} className="overflow-hidden">
+                                <CardContent className="p-4">
+                                  <div className="flex gap-3">
+                                    <div className="flex-shrink-0">
+                                      <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                                        <CheckCircle2 className="h-5 w-5 text-blue-600" />
+                                      </div>
+                                    </div>
+                                    <div className="flex-1 min-w-0 space-y-3">
+                                      <div className="flex md:flex-row flex-col items-start md:items-center justify-between gap-2">
+                                        <span className="font-medium text-gray-900">เช็คอิน #{index + 1}</span>
+                                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                                          <Badge variant="secondary">
+                                            {formatThaiDate(checkin.created_at)}
+                                          </Badge>
+                                          <span className="flex items-center gap-1">
+                                            <Clock className="h-3 w-3" />
+                                            {new Date(checkin.created_at).toLocaleTimeString('th-TH', {
+                                              hour: '2-digit',
+                                              minute: '2-digit',
+                                              hour12: false
+                                            })}
+                                          </span>
+                                        </div>
+                                      </div>
+
+                                      {checkin.detail && (
+                                        <div className="p-3 rounded-lg bg-gray-50 border">
+                                          <p className="text-sm text-gray-700 leading-relaxed">{checkin.detail}</p>
+                                        </div>
+                                      )}
+
+                                      {checkin.images && checkin.images.length > 0 && (
+                                        <div className="space-y-2">
+                                          <div className="flex items-center gap-2 text-sm font-medium text-gray-900">
+                                            <Camera className="h-4 w-4 text-blue-600" />
+                                            <span>รูปภาพ ({checkin.images.length})</span>
+                                          </div>
+                                          <div className="rounded-lg overflow-hidden border">
+                                            <ImageGallery
+                                              images={checkin.images}
+                                              bucket="event-checkins"
+                                              isPrivate={true}
+                                            />
+                                          </div>
+                                        </div>
+                                      )}
+
+                                      {(checkin.product_selections?.length || checkin.delivery_duration || checkin.purchase_type || checkin.purchase_months?.length || checkin.competitor_brand) && (
+                                        <div className="space-y-2 rounded-lg bg-indigo-50 border border-indigo-200">
+                                          <div className="px-3 py-2 border-b border-indigo-200 bg-indigo-600">
+                                            <h5 className="text-sm font-semibold text-white flex items-center gap-2">
+                                              <FileText className="h-4 w-4" />
+                                              ข้อมูลการนำเสนอ
+                                            </h5>
+                                          </div>
+                                          <div className="p-3">
+                                            <PresentCheckinFields
+                                              products={products}
+                                              isEditing={false}
+                                              productSelections={checkin.product_selections || []}
+                                              deliveryDuration={checkin.delivery_duration || ""}
+                                              purchaseType={checkin.purchase_type}
+                                              purchaseMonths={checkin.purchase_months || []}
+                                              competitorBrand={checkin.competitor_brand || ""}
+                                              specialRequirements={checkin.special_requirements || ""}
+                                            />
+                                          </div>
+                                        </div>
+                                      )}
+
+                                      {(checkin.test_result || checkin.got_job) && (
+                                        <div className="space-y-2 rounded-lg bg-emerald-50 border border-emerald-200">
+                                          <div className="px-3 py-2 border-b border-emerald-200 bg-emerald-600">
+                                            <h5 className="text-sm font-semibold text-white flex items-center gap-2">
+                                              <CheckCircle2 className="h-4 w-4" />
+                                              ข้อมูลผลเทส
+                                            </h5>
+                                          </div>
+                                          <div className="p-3">
+                                            <TestResultFields
+                                              testResult={checkin.test_result || ""}
+                                              testResultReason={checkin.test_result_reason || ""}
+                                              gotJob={checkin.got_job || ""}
+                                              gotJobReason={checkin.got_job_reason || ""}
+                                              onTestResultChange={() => {}}
+                                              onTestResultReasonChange={() => {}}
+                                              onGotJobChange={() => {}}
+                                              onGotJobReasonChange={() => {}}
+                                            />
+                                          </div>
+                                        </div>
+                                      )}
+
+                                      {checkin.problem_types && checkin.problem_types.length > 0 && (
+                                        <div className="space-y-2 rounded-lg bg-red-50 border border-red-300">
+                                          <div className="px-3 py-2 border-b border-red-300 bg-red-600">
+                                            <h5 className="text-sm font-semibold text-white flex items-center gap-2">
+                                              <AlertTriangle className="h-4 w-4" />
+                                              ประเภทปัญหา
+                                            </h5>
+                                          </div>
+                                          <div className="p-3">
+                                            <div className="flex flex-wrap gap-2">
+                                              {checkin.problem_types.map(pt => (
+                                                <Badge key={pt} variant="secondary" className="bg-red-100 text-red-700 border-red-200 hover:bg-red-200">
+                                                  {PROBLEM_TYPES.find(p => p.value === pt)?.label || pt}
+                                                </Badge>
+                                              ))}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      )}
                                     </div>
                                   </div>
-                                  <div className="flex-1 space-y-2">
-                                    <div className="flex md:flex-row flex-col items-start md:items-center justify-between">
-                                      <span className="font-medium text-green-800 text-sm md:text-base">เช็คอิน #{index + 1}</span>
-                                      <span className="text-xs md:text-sm text-green-600 flex items-center gap-1">
-                                        <Clock className="h-3 w-3" />
-                                        {formatThaiDate(checkin.created_at)}
-                                      </span>
-                                    </div>
-                                    <p className="text-gray-700 leading-relaxed text-sm md:text-base">{checkin.detail}</p>
-                                    {checkin.images && checkin.images.length > 0 && (
-                                      <div className="pt-2">
-                                        <ImageGallery
-                                          images={checkin.images}
-                                          bucket="event-checkins"
-                                          isPrivate={true}
-                                        />
-                                      </div>
-                                    )}
-                                    
-                                    {/* PRESENT Check-in Fields - Read Only */}
-                                    {(checkin.product_selections?.length || checkin.delivery_duration || checkin.purchase_type || checkin.purchase_months?.length || checkin.competitor_brand) && (
-                                      <div className="pt-4 border-t border-green-200 mt-4">
-                                        <h5 className="font-medium text-sm mb-3 flex items-center gap-2 text-green-800">
-                                          <FileText className="h-4 w-4" />
-                                          ข้อมูลการนำเสนอ
-                                        </h5>
-                                        <PresentCheckinFields
-                                          products={products}
-                                          isEditing={false}
-                                          productSelections={checkin.product_selections || []}
-                                          deliveryDuration={checkin.delivery_duration || ""}
-                                          purchaseType={checkin.purchase_type}
-                                          purchaseMonths={checkin.purchase_months || []}
-                                          competitorBrand={checkin.competitor_brand || ""}
-                                          specialRequirements={checkin.special_requirements || ""}
-                                        />
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
+                                </CardContent>
+                              </Card>
                             ))}
                           </div>
                         </div>

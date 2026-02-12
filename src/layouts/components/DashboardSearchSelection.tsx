@@ -52,10 +52,6 @@ export function DashboardSearchSelection() {
     return () => clearTimeout(debounceTimer)
   }, [searchQuery])
 
-  useEffect(() => {
-    console.log(companies)
-  }, [companies])
-
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>

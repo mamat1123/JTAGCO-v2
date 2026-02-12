@@ -23,7 +23,6 @@ import { Product } from "@/entities/Product/product";
 import { format, startOfWeek } from "date-fns";
 import { th } from "date-fns/locale";
 import { useProducts } from "@/features/Settings/Products/hooks/useProducts";
-import { useEffect } from "react";
 
 const PO_SUB_TYPES = [26, 28];
 
@@ -105,7 +104,7 @@ export function SalesSummaryCards({
     try {
       const date = new Date(dateString);
       return format(date, "dd MMM 2569", { locale: th });
-    } catch (error) {
+    } catch {
       return dateString;
     }
   };
@@ -127,7 +126,6 @@ export function SalesSummaryCards({
     const poEvents = eventsInWeek.filter((event) =>
       PO_SUB_TYPES.includes(event.sub_type_id || 0),
     );
-    console.log(poEvents);
     return poEvents.reduce((sum, event) => sum + Number(event.sales_before_vat || 0), 0);
   };
 
@@ -153,7 +151,7 @@ export function SalesSummaryCards({
 
   const getFilterBadgeValue = (
     key: string,
-    value: any,
+    value: string,
     events: BackendEvent[],
     products: Product[],
   ): string => {
@@ -288,14 +286,6 @@ export function SalesSummaryCards({
 
   const weeks = getCurrentMonthWeeks(currentYear, currentMonth);
 
-  useEffect(() => {
-    console.log(
-      weeks.map((weekStart) => ({
-        weekLabel: getWeekLabel(weekStart),
-        total: getWeekPoVat(events, weekStart),
-      })),
-    );
-  }, [weeks]);
   const weeklyPoVat = weeks
     .map((weekStart) => ({
       weekLabel: getWeekLabel(weekStart),
@@ -408,7 +398,7 @@ export function SalesSummaryCards({
 
       {filterBadges.length > 0 && (
         <div className="flex flex-wrap gap-2 mt-4">
-          {filterBadges.map((badge, _index) => badge)}
+          {filterBadges.map((badge) => badge)}
         </div>
       )}
     </div>

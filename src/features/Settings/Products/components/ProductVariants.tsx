@@ -31,7 +31,7 @@ export function ProductVariants({ productId, variants, onAdd, onUpdate, onDelete
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
-  const handleSubmit = async (formData: any) => {
+  const handleSubmit = async (formData: CreateProductVariantDTO) => {
     try {
       setIsLoading(true);
       const variantData: CreateProductVariantDTO = {
@@ -49,14 +49,14 @@ export function ProductVariants({ productId, variants, onAdd, onUpdate, onDelete
           description: "อัพเดทตัวแปรสินค้าเรียบร้อยแล้ว",
         });
       } else {
-        const createdVariants = await productAPI.createMultipleProductVariants(formData);
+        const createdVariants = await productAPI.createMultipleProductVariants([formData]);
         onAdd(createdVariants);
         setIsAddDialogOpen(false);
         toast.success("เพิ่มสำเร็จ", {
           description: `เพิ่มตัวแปรสินค้า ${createdVariants.length} รายการเรียบร้อยแล้ว`,
         });
       }
-    } catch (error) {
+    } catch {
       toast.error("เกิดข้อผิดพลาด", {
         description: "ไม่สามารถเพิ่มตัวแปรสินค้าได้",
       });

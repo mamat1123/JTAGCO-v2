@@ -36,7 +36,7 @@ export const ApproveUserPage = () => {
     try {
       const allProfiles = await profileAPI.getProfile();
       setProfiles(allProfiles);
-    } catch (error) {
+    } catch {
       toast.error('ไม่สามารถดึงข้อมูลผู้ใช้ได้');
     } finally {
       setLoading(false);
@@ -50,7 +50,7 @@ export const ApproveUserPage = () => {
       fetchProfiles();
       setIsActionModalOpen(false);
       setSelectedProfile(null);
-    } catch (error) {
+    } catch {
       toast.error(`ไม่สามารถ${status === 'approved' ? 'อนุมัติ' : 'ปฏิเสธ'}ได้`);
     }
   };

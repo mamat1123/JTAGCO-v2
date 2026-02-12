@@ -19,7 +19,7 @@ export function CustomerPage() {
       });
       toast.success("เพิ่มข้อมูลผู้ติดต่อสำเร็จ");
       fetchCompany(currentCompany?.id);
-    } catch (error) {
+    } catch {
       toast.error("ไม่สามารถเพิ่มข้อมูลผู้ติดต่อได้");
     }
   };
@@ -38,7 +38,7 @@ export function CustomerPage() {
       await customerAPI.updateCustomer(customer.id, body);
       toast.success("แก้ไขข้อมูลผู้ติดต่อสำเร็จ");
       fetchCompany(currentCompany?.id);
-    } catch (error) {
+    } catch {
       toast.error("ไม่สามารถแก้ไขข้อมูลผู้ติดต่อได้");
     }
   };
@@ -49,7 +49,7 @@ export function CustomerPage() {
       await customerAPI.deleteCustomer(customer.id);
       toast.success("ลบข้อมูลผู้ติดต่อสำเร็จ");
       fetchCompany(currentCompany?.id);
-    } catch (error) {
+    } catch {
       toast.error("ไม่สามารถลบข้อมูลผู้ติดต่อได้");
     }
   };

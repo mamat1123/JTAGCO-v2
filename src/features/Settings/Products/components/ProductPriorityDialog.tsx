@@ -54,12 +54,12 @@ export function ProductPriorityDialog({ isOpen, onOpenChange, products }: Produc
     setLocalProducts(sorted);
   }, [products]);
 
-  const onDragEnd = async (event: any) => {
+  const onDragEnd = async (event: { active: { id: string | number }; over: { id: string | number } | null }) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
 
-    const oldIndex = localProducts.findIndex(p => p.id === active.id);
-    const newIndex = localProducts.findIndex(p => p.id === over.id);
+    const oldIndex = localProducts.findIndex(p => p.id === String(active.id));
+    const newIndex = localProducts.findIndex(p => p.id === String(over.id));
 
     if (oldIndex === -1 || newIndex === -1) return;
 
@@ -73,7 +73,7 @@ export function ProductPriorityDialog({ isOpen, onOpenChange, products }: Produc
       await productAPI.updateProduct(movedProduct.id, { priority: newIndex } as Partial<CreateProductDTO>);
       setUpdatingProductId(null);
       toast.success('อัปเดตความสำคัญเรียบร้อยแล้ว');
-    } catch (error) {
+    } catch {
       setUpdatingProductId(null);
       toast.error('ไม่สามารถอัปเดตความสำคัญได้');
       const reverted = arrayMove(newOrder, newIndex, oldIndex);

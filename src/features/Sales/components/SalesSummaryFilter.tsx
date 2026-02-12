@@ -37,19 +37,23 @@ interface SalesSummaryFilterProps {
 
 export const SalesSummaryFilter = ({ onFilterChange }: SalesSummaryFilterProps) => {
   const today = new Date();
+  const defaultFrom = startOfMonth(today);
+  defaultFrom.setHours(defaultFrom.getHours() + 7, defaultFrom.getMinutes(), defaultFrom.getSeconds());
+  const defaultTo = endOfMonth(today);
+  defaultTo.setHours(defaultTo.getHours() + 7, defaultTo.getMinutes(), defaultTo.getSeconds());
   const [filters, setFilters] = useState<SalesSummaryFilters>({
     status: 'all',
     user_id: 'all',
     main_type_id: 'all',
     sub_type_id: 'all',
     tagged_product_id: 'all',
-    scheduled_at_start: startOfMonth(today).toISOString(),
-    scheduled_at_end: endOfMonth(today).toISOString(),
+    scheduled_at_start: defaultFrom.toISOString(),
+    scheduled_at_end: defaultTo.toISOString(),
   });
   const [isExpanded, setIsExpanded] = useState(true);
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: startOfMonth(today),
-    to: endOfMonth(today),
+    from: defaultFrom,
+    to: defaultTo,
   });
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   
@@ -71,10 +75,19 @@ export const SalesSummaryFilter = ({ onFilterChange }: SalesSummaryFilterProps) 
   const handleDateRangeChange = (range: DateRange | undefined) => {
     setDateRange(range);
     if (range?.from) {
+      const from = new Date(range.from);
+      from.setHours(from.getHours() + 7, from.getMinutes(), from.getSeconds());
+      
+      let to = from;
+      if (range?.to) {
+        to = new Date(range.to);
+        to.setHours(to.getHours() + 7, to.getMinutes(), to.getSeconds());
+      }
+      
       const newFilters = {
         ...filters,
-        scheduled_at_start: range.from.toISOString(),
-        scheduled_at_end: range?.to ? range.to.toISOString() : range.from.toISOString(),
+        scheduled_at_start: from.toISOString(),
+        scheduled_at_end: to.toISOString(),
       };
       setFilters(newFilters);
       onFilterChange(newFilters);
@@ -299,9 +312,13 @@ export const SalesSummaryFilter = ({ onFilterChange }: SalesSummaryFilterProps) 
                   size="sm"
                   onClick={() => {
                     const today = new Date();
+                    const defaultFrom = startOfMonth(today);
+                    defaultFrom.setHours(defaultFrom.getHours() + 7, defaultFrom.getMinutes(), defaultFrom.getSeconds());
+                    const defaultTo = endOfMonth(today);
+                    defaultTo.setHours(defaultTo.getHours() + 7, defaultTo.getMinutes(), defaultTo.getSeconds());
                     const defaultRange = {
-                      from: startOfMonth(today),
-                      to: endOfMonth(today),
+                      from: defaultFrom,
+                      to: defaultTo,
                     };
                     const resetFilters = {
                       status: 'all' as const,
@@ -309,8 +326,8 @@ export const SalesSummaryFilter = ({ onFilterChange }: SalesSummaryFilterProps) 
                       main_type_id: 'all',
                       sub_type_id: 'all',
                       tagged_product_id: 'all',
-                      scheduled_at_start: defaultRange.from.toISOString(),
-                      scheduled_at_end: defaultRange.to.toISOString(),
+                      scheduled_at_start: defaultFrom.toISOString(),
+                      scheduled_at_end: defaultTo.toISOString(),
                     };
                     setDateRange(defaultRange);
                     setFilters(resetFilters);

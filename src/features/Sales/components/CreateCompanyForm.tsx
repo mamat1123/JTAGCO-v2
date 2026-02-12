@@ -65,7 +65,7 @@ export function CreateCompanyForm({ onSubmit }: CreateCompanyFormProps) {
       };
 
       await onSubmit(submitData);
-    } catch (error) {
+    } catch {
       toast.error("เกิดข้อผิดพลาดในการสร้างบริษัท");
     } finally {
       setLoading(false);

@@ -10,14 +10,18 @@ import { th } from "date-fns/locale";
 
 export function SalesDashboardPage() {
   const today = new Date();
+  const defaultFrom = startOfMonth(today);
+  defaultFrom.setHours(defaultFrom.getHours() + 7, defaultFrom.getMinutes(), defaultFrom.getSeconds());
+  const defaultTo = endOfMonth(today);
+  defaultTo.setHours(defaultTo.getHours() + 7, defaultTo.getMinutes(), defaultTo.getSeconds());
   const [filters, setFilters] = useState<SalesSummaryFilters>({
     status: "all",
     user_id: "all",
     main_type_id: "all",
     sub_type_id: "all",
     tagged_product_id: "all",
-    scheduled_at_start: startOfMonth(today).toISOString(),
-    scheduled_at_end: endOfMonth(today).toISOString(),
+    scheduled_at_start: defaultFrom.toISOString(),
+    scheduled_at_end: defaultTo.toISOString(),
   });
 
   const { data: metrics, isLoading: isLoadingMetrics } = useQuery({

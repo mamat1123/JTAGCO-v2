@@ -14,7 +14,7 @@ import { useState } from "react";
 export function CreateCompanyPage() {
   const navigate = useNavigate();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [createdCompany, setCreatedCompany] = useState<any>(null);
+  const [createdCompany, setCreatedCompany] = useState<{ id: string; name: string } | null>(null);
 
   const handleSubmit = async (formData: CreateCompanyDTO) => {
     try {
@@ -34,7 +34,7 @@ export function CreateCompanyPage() {
 
   const handleSuccessModalClose = () => {
     setShowSuccessModal(false);
-    navigate(`/companies/${createdCompany.id}`);
+    navigate(`/companies/${createdCompany?.id}`);
   };
 
   return (

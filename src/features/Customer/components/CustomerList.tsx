@@ -51,7 +51,7 @@ export function CustomerList({
         setIsSubmitting(true);
         await onDelete(customerToDelete);
         toast.success("ลบข้อมูลผู้ติดต่อสำเร็จ");
-      } catch (error) {
+      } catch {
         toast.error("ไม่สามารถลบข้อมูลผู้ติดต่อได้");
       } finally {
         setIsSubmitting(false);
@@ -70,7 +70,7 @@ export function CustomerList({
         });
         toast.success("แก้ไขข้อมูลผู้ติดต่อสำเร็จ");
         setCustomerToEdit(null);
-      } catch (error) {
+      } catch {
         toast.error("ไม่สามารถแก้ไขข้อมูลผู้ติดต่อได้");
       } finally {
         setIsSubmitting(false);
@@ -85,7 +85,7 @@ export function CustomerList({
         await onAdd(data as CreateCustomerDTO);
         toast.success("เพิ่มข้อมูลผู้ติดต่อสำเร็จ");
         onAddModalChange?.(false);
-      } catch (error) {
+      } catch {
         toast.error("ไม่สามารถเพิ่มข้อมูลผู้ติดต่อได้");
       } finally {
         setIsSubmitting(false);

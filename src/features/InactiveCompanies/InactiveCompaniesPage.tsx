@@ -33,6 +33,7 @@ import {
 } from "@/shared/components/ui/table";
 import { Badge } from "@/shared/components/ui/badge";
 import { companyAPI } from "@/entities/Company/companyAPI";
+import { InactiveCompany } from "@/entities/Company/company";
 import { useQuery } from "@tanstack/react-query";
 import { formatThaiDate } from "@/shared/utils/dateUtils";
 import { useNavigate } from "react-router-dom";
@@ -46,7 +47,7 @@ export const InactiveCompaniesPage = () => {
   const [sortBy, setSortBy] = useState<SortOption>("last_event_updated_at");
   const [user_id, setUser_id] = useState<string | undefined>(undefined);
   const [page, setPage] = useState(1);
-  const [allCompanies, setAllCompanies] = useState<any[]>([]);
+  const [allCompanies, setAllCompanies] = useState<InactiveCompany[]>([]);
   const limit = 100;
   const loadingRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -91,13 +92,15 @@ export const InactiveCompaniesPage = () => {
         setAllCompanies((prev) => [...prev, ...data.data]);
       }
     }
-  }, [data?.data, page]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data?.data]);
 
   // Reset allCompanies when filters change (user_id, monthsBack, sortBy)
   useEffect(() => {
     if (page === 1) {
       setAllCompanies([]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user_id, monthsBack, sortBy]);
 
   // Infinite scroll observer
@@ -380,7 +383,7 @@ export const InactiveCompaniesPage = () => {
                                 : ""
                             }
                           >
-                            {formatThaiDate(company.lastEventUpdatedAt)}
+                            {formatThaiDate(company.lastEventUpdatedAt || '')}
                           </span>
                         </div>
                       </TableCell>

@@ -36,7 +36,7 @@ export default function ProductsPage() {
         setIsLoading(true);
         const data = await productAPI.getProducts();
         setProducts(data);
-      } catch (err) {
+      } catch {
         toast.error('ไม่สามารถดึงข้อมูลสินค้าได้');
       } finally {
         setIsLoading(false);
@@ -53,7 +53,7 @@ export default function ProductsPage() {
         try {
           const data = await productAPI.getProductVariants(selectedProduct.id);
           setVariants(data);
-        } catch (err) {
+        } catch {
           toast.error('ไม่สามารถดึงข้อมูลตัวแปรสินค้าได้');
         }
       }
@@ -70,7 +70,7 @@ export default function ProductsPage() {
         setProducts((prev) => [...prev, newProduct]);
         setIsCreateDialogOpen(false);
         toast.success('เพิ่มสินค้าเรียบร้อยแล้ว');
-      } catch (err) {
+      } catch {
         toast.error('ไม่สามารถเพิ่มสินค้าได้');
       }
     }
@@ -88,7 +88,7 @@ export default function ProductsPage() {
         );
         setEditingProduct(null);
         toast.success('อัปเดตสินค้าเรียบร้อยแล้ว');
-      } catch (err) {
+      } catch {
         toast.error('ไม่สามารถอัปเดตสินค้าได้');
       }
     }
@@ -106,7 +106,7 @@ export default function ProductsPage() {
           setVariants([]);
         }
         toast.success('ลบสินค้าเรียบร้อยแล้ว');
-      } catch (err) {
+      } catch {
         toast.error('ไม่สามารถลบสินค้าได้');
       }
     }
@@ -126,7 +126,7 @@ export default function ProductsPage() {
         )
       );
       toast.success('อัปเดตตัวแปรสินค้าเรียบร้อยแล้ว');
-    } catch (err) {
+    } catch {
       toast.error('ไม่สามารถอัปเดตตัวแปรสินค้าได้');
     }
   };
@@ -136,7 +136,7 @@ export default function ProductsPage() {
       await productAPI.deleteProductVariant(id);
       setVariants((prev) => prev.filter((variant) => variant.id !== id));
       toast.success('ลบตัวแปรสินค้าเรียบร้อยแล้ว');
-    } catch (err) {
+    } catch {
       toast.error('ไม่สามารถลบตัวแปรสินค้าได้');
     }
   };

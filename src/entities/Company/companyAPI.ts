@@ -31,7 +31,7 @@ export const companyAPI = {
 
   getInactiveCompanies: async (params: InactiveCompaniesDto): Promise<PaginatedResponse<InactiveCompany>> => {
     try {
-      const queryParams: any = {
+      const queryParams: Record<string, string | number | undefined> = {
         page: params.page || 1,
         limit: params.limit || 10,
         months: params.months || 3,
@@ -67,7 +67,7 @@ export const companyAPI = {
 
   getInactiveCompanyStats: async (params: { months: number; user_id?: string; sortBy?: string; }): Promise<InactiveCompanyStats> => {
     try {
-      const queryParams: any = {
+      const queryParams: Record<string, string | number | undefined> = {
         months: params.months || 3,
       };
 

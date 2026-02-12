@@ -25,9 +25,10 @@ export default function LoginPage() {
     try {
       await login({ username, password });
       navigate('/dashboard');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.log(err);
-      if (err.response.data.message === 'Your account is not approved yet') {
+      const axiosErr = err as { response?: { data?: { message?: string } } };
+      if (axiosErr.response?.data?.message === 'Your account is not approved yet') {
         setShowUnapprovedDialog(true);
       } else {
         setError('Invalid username or password');

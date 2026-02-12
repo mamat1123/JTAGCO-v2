@@ -1,5 +1,6 @@
 import { Button } from '@/shared/components/ui/button';
 import { X } from 'lucide-react';
+import { ProductAttributes } from '@/entities/Product/product';
 
 interface ColorWithImage {
   color: string;
@@ -7,11 +8,12 @@ interface ColorWithImage {
 }
 
 interface AttributeListProps {
-  attributes: Record<string, any>;
+  attributes: ProductAttributes;
   onRemoveAttribute: (key: string) => void;
 }
 
 export function AttributeList({ attributes, onRemoveAttribute }: AttributeListProps) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const renderAttributeValue = (key: string, value: any) => {
     // Handle colors array
     if (key === 'colors' && Array.isArray(value)) {
@@ -62,7 +64,7 @@ export function AttributeList({ attributes, onRemoveAttribute }: AttributeListPr
   return (
     <div className="space-y-2">
       {Object.entries(attributes)
-        .filter(([_, value]) => value !== undefined && value !== null)
+        .filter(([, value]) => value !== undefined && value !== null)
         .map(([key, value]) => (
           <div
             key={key}

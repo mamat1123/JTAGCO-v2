@@ -23,6 +23,7 @@ export const ShoeReturnsPage = () => {
 
   useEffect(() => {
     setSelectedReturn(mockReturns[0]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Mock data - Replace with actual API call

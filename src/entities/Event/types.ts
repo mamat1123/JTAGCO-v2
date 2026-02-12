@@ -30,7 +30,7 @@ export interface CreateEventDto {
   status?: EventStatus;
 }
 
-export interface UpdateEventDto extends Partial<CreateEventDto> {}
+export type UpdateEventDto = Partial<CreateEventDto>;
 
 export interface QueryEventParams {
   company_id?: string;
@@ -59,4 +59,9 @@ export interface EventCheckinDto {
   purchase_months?: string[];
   competitor_brand?: string;
   special_requirements?: string;
+  // TEST_RESULT check-in fields
+  test_result?: string;
+  test_result_reason?: string;
+  got_job?: string;
+  got_job_reason?: string;
 }

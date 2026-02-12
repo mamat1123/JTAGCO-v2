@@ -35,6 +35,7 @@ export function CompanyEvents({ companyId }: CompanyEventsProps) {
 
   useEffect(() => {
     fetchEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [companyId]);
 
   useEffect(() => {

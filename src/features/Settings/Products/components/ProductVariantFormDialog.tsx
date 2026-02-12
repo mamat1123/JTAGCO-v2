@@ -123,12 +123,12 @@ export function ProductVariantFormDialog({
   };
 
   // Add this function to check for unsaved attributes
-  const checkUnsavedAttributes = () => {
+  const checkUnsavedAttributes = (): boolean => {
     return (
       selectedAttributeType !== "" &&
       ((selectedAttributeType === "size" && (sizeRange.min !== 0 || sizeRange.max !== 0)) ||
         (selectedAttributeType === "color" && selectedColors.length > 0) ||
-        (selectedAttributeType === "image" && formData.attributes?.image) ||
+        (selectedAttributeType === "image" && !!formData.attributes?.image) ||
         (selectedAttributeType === "steel_plate" && steelPlateValue !== "") ||
         (isCustomAttribute && (customAttributeKey !== "" || attributeValue !== "")) ||
         (!isCustomAttribute && attributeValue !== ""))
@@ -138,6 +138,7 @@ export function ProductVariantFormDialog({
   // Update hasUnsavedAttributes whenever relevant states change
   useEffect(() => {
     setHasUnsavedAttributes(checkUnsavedAttributes());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     selectedAttributeType,
     sizeRange,
@@ -214,7 +215,7 @@ export function ProductVariantFormDialog({
   const handleAddAttribute = () => {
     if (!selectedAttributeType) return;
 
-    let newAttributes = { ...formData.attributes };
+    const newAttributes = { ...formData.attributes };
 
     if (selectedAttributeType === "size") {
       if (sizeRange.min === 0 || sizeRange.max === 0) return;

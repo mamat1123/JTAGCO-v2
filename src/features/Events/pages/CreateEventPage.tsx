@@ -34,7 +34,6 @@ import {
 import {
   SalesBeforeVatField,
   CallNewFields,
-  TestResultFields,
   PresentTimeField,
 } from "../components/ConditionalFields";
 
@@ -98,7 +97,6 @@ export function CreateEventPage() {
     test_result_reason: "",
     got_job: "",
     got_job_reason: "",
-    problem_type: "",
     present_time: "",
   });
   const [date, setDate] = React.useState<Date>(new Date());
@@ -137,15 +135,11 @@ export function CreateEventPage() {
 
   // Conditional field visibility flags
   const showSalesBeforeVat = React.useMemo(() => {
-    return [SUB_TYPE_CODES.PO_NEW, SUB_TYPE_CODES.PO_OLD].includes(subTypeCode as any);
+    return ([SUB_TYPE_CODES.PO_NEW, SUB_TYPE_CODES.PO_OLD] as string[]).includes(subTypeCode);
   }, [subTypeCode]);
 
   const showCallNewFields = React.useMemo(() => {
-    return [SUB_TYPE_CODES.CALL_NEW_1, SUB_TYPE_CODES.CALL_NEW_2].includes(subTypeCode as any);
-  }, [subTypeCode]);
-
-  const showTestResultFields = React.useMemo(() => {
-    return subTypeCode === SUB_TYPE_CODES.TEST_RESULT;
+    return ([SUB_TYPE_CODES.CALL_NEW_1, SUB_TYPE_CODES.CALL_NEW_2] as string[]).includes(subTypeCode);
   }, [subTypeCode]);
 
   // Show test date range for SENT_TEST sub type
@@ -175,9 +169,9 @@ export function CreateEventPage() {
     return showPresentTimeField || isFirstVisitMainType;
   }, [showPresentTimeField, isFirstVisitMainType]);
 
-  // Description required for specific sub types (only CALL_OLD now)
+  // Description required for specific sub types
   const requireDescription = React.useMemo(() => {
-    return [SUB_TYPE_CODES.CALL_OLD].includes(subTypeCode as any);
+    return ([SUB_TYPE_CODES.CALL_OLD] as string[]).includes(subTypeCode);
   }, [subTypeCode]);
 
   // Shoe + insole requirement for specific sub types (NOT for CALL_NEW_1, CALL_NEW_2)
@@ -187,7 +181,6 @@ export function CreateEventPage() {
       SUB_TYPE_CODES.QUOTATION_OLD,
       SUB_TYPE_CODES.PO_NEW,
       SUB_TYPE_CODES.PO_OLD,
-      SUB_TYPE_CODES.CALL_OLD,
       SUB_TYPE_CODES.SHIPPING,
       SUB_TYPE_CODES.BILLING,
       SUB_TYPE_CODES.ACCEPTING_CHEQUE,
@@ -200,7 +193,7 @@ export function CreateEventPage() {
       SUB_TYPE_CODES.FOUND_PROBLEM,
       SUB_TYPE_CODES.OTHER,
     ];
-    return requiresProductTypes.includes(subTypeCode as any);
+    return (requiresProductTypes as string[]).includes(subTypeCode);
   }, [subTypeCode]);
 
   // Images required for specific sub types (NOT for most VISIT types - only checkin required)
@@ -210,17 +203,15 @@ export function CreateEventPage() {
       SUB_TYPE_CODES.QUOTATION_OLD,
       SUB_TYPE_CODES.PO_NEW,
       SUB_TYPE_CODES.PO_OLD,
-      // Note: Most VISIT types don't require images on create, only on checkin
-      SUB_TYPE_CODES.TEST_RESULT,
       SUB_TYPE_CODES.VISIT_SEND_SAMPLE,
     ];
-    return requiresImageTypes.includes(subTypeCode as any);
+    return (requiresImageTypes as string[]).includes(subTypeCode);
   }, [subTypeCode]);
 
   // Customer required for VISIT types, and specific sub types
   const requireCustomer = React.useMemo(() => {
-    return isVisitEvent || 
-           [
+    return isVisitEvent ||
+           ([
              SUB_TYPE_CODES.QUOTATION_NEW,
              SUB_TYPE_CODES.QUOTATION_OLD,
              SUB_TYPE_CODES.PO_NEW,
@@ -228,7 +219,7 @@ export function CreateEventPage() {
              SUB_TYPE_CODES.CALL_OLD,
              SUB_TYPE_CODES.SHIPPING,
              SUB_TYPE_CODES.BILLING,
-           ].includes(subTypeCode as any);
+           ] as string[]).includes(subTypeCode);
   }, [isVisitEvent, subTypeCode]);
 
   // Get min date for calendar (today if visit event, undefined otherwise)
@@ -250,7 +241,6 @@ export function CreateEventPage() {
       test_result_reason: "",
       got_job: "",
       got_job_reason: "",
-      problem_type: "",
       present_time: "",
     }));
   }, [formData.sub_type_id]);
@@ -350,24 +340,6 @@ export function CreateEventPage() {
       }
     }
 
-    // Validate test result fields
-    if (showTestResultFields) {
-      if (!formData.test_result) {
-        hasError = true;
-      }
-      if (formData.test_result === 'fail' && !formData.test_result_reason) {
-        hasError = true;
-      }
-      if (formData.test_result === 'pass') {
-        if (!formData.got_job) {
-          hasError = true;
-        }
-        if (formData.got_job === 'no' && !formData.got_job_reason) {
-          hasError = true;
-        }
-      }
-    }
-
     // Validate test date range for SENT_TEST
     if (requireTestDateRange && (!testDateRange.from || !testDateRange.to)) {
       hasError = true;
@@ -421,11 +393,6 @@ export function CreateEventPage() {
         shoe_order_quantity: showCallNewFields ? formData.shoe_order_quantity : undefined,
         has_appointment: showCallNewFields ? formData.has_appointment : undefined,
         purchase_months: showCallNewFields ? formData.purchase_months : undefined,
-        test_result: showTestResultFields ? formData.test_result : undefined,
-        test_result_reason: showTestResultFields && formData.test_result === 'fail' ? formData.test_result_reason : undefined,
-        got_job: showTestResultFields && formData.test_result === 'pass' ? formData.got_job : undefined,
-        got_job_reason: showTestResultFields && formData.test_result === 'pass' && formData.got_job === 'no' ? formData.got_job_reason : undefined,
-        problem_type: undefined,
         present_time: showTimePicker ? formData.present_time : undefined,
       }
       await createEvent.mutateAsync(body);
@@ -610,19 +577,7 @@ export function CreateEventPage() {
               />
             )}
 
-            {showTestResultFields && (
-              <TestResultFields
-                testResult={formData.test_result}
-                testResultReason={formData.test_result_reason}
-                gotJob={formData.got_job}
-                gotJobReason={formData.got_job_reason}
-                onTestResultChange={(value) => setFormData(prev => ({ ...prev, test_result: value }))}
-                onTestResultReasonChange={(value) => setFormData(prev => ({ ...prev, test_result_reason: value }))}
-                onGotJobChange={(value) => setFormData(prev => ({ ...prev, got_job: value }))}
-                onGotJobReasonChange={(value) => setFormData(prev => ({ ...prev, got_job_reason: value }))}
-                showValidation={formSubmitted}
-              />
-            )}
+
 
             {showTimePicker && (
               <PresentTimeField

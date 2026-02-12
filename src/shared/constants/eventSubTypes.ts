@@ -67,6 +67,7 @@ export const PROBLEM_TYPES = [
   { value: 'leather', label: 'หนัง' },
   { value: 'eyelet', label: 'ตาไก่' },
   { value: 'steel_toe', label: 'หัวเหล็ก' },
+  { value: 'lining', label: 'ผ้าซับใน' },
   { value: 'insole', label: 'แผ่นรองใน' },
 ] as const;
 

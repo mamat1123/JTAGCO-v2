@@ -6,7 +6,7 @@ export class BusinessTypeService {
     try {
       const { data } = await api.get<BusinessTypeDto[]>('/business-types');
       return data;
-    } catch (error) {
+    } catch {
       throw new Error('Failed to fetch business types');
     }
   }

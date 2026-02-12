@@ -17,7 +17,7 @@ export const storageService = {
    */
   cleanPath(path: string): string {
     // Remove any full URLs and keep only the relative path
-    const urlPattern = /https?:\/\/[^\/]+\/storage\/v1\/object\/(?:public|sign|authenticated)\/[^\/]+\//;
+    const urlPattern = /https?:\/\/[^/]+\/storage\/v1\/object\/(?:public|sign|authenticated)\/[^/]+\//;
     return path.replace(urlPattern, '');
   },
 

@@ -4,9 +4,8 @@ export enum ProductType {
   TOE_CAP = 'toe_cap',
 }
 
-export interface ProductAttributes {
-  [key: string]: any;
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ProductAttributes = Record<string, any>;
 
 export interface ProductVariant {
   id: string;

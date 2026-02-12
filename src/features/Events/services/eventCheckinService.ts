@@ -15,6 +15,11 @@ interface EventCheckin {
   purchase_months?: string[];
   competitor_brand?: string;
   special_requirements?: string;
+  // TEST_RESULT check-in fields
+  test_result?: string;
+  test_result_reason?: string;
+  got_job?: string;
+  got_job_reason?: string;
 }
 
 export function useEventCheckins(eventId: string | null) {

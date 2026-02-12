@@ -49,7 +49,8 @@ export function EditCompany() {
           BusinessTypeService.getAll()
         ]);
         // Remove properties that should not exist in UpdateCompanyDTO
-        const { id: _, created_at: __, updated_at: ___, customers: ____, user_id: _____, ...updateData } = companyData;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { id: _id, created_at: _created_at, updated_at: _updated_at, customers: _customers, user_id: _user_id, ...updateData } = companyData;
         setCompany({
           ...updateData,
           zip_code: updateData.zip_code ? Number(updateData.zip_code) : 0

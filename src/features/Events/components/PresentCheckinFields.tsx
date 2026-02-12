@@ -104,7 +104,7 @@ export function PresentCheckinFields({
       });
       setSelections(items);
     }
-  }, [productSelections, products]);
+  }, [productSelections, products, selections.length]);
 
   // Notify parent about changes
   React.useEffect(() => {
@@ -115,13 +115,14 @@ export function PresentCheckinFields({
       price_range: item.price_range,
     }));
     onProductSelectionsChange?.(newSelections);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selections]);
 
   // Helper function to check if product is insole
-  const isInsoleProduct = (item: ProductSelectionItem): boolean => {
+  const isInsoleProduct = React.useCallback((item: ProductSelectionItem): boolean => {
     const product = products.find((p) => p.id === item.product_id);
     return product?.type === ProductType.INSOLE;
-  };
+  }, [products]);
 
   // Validation
   const validation = React.useMemo(() => {
@@ -395,7 +396,7 @@ export function PresentCheckinFields({
                       onChange={(e) => {
                         const value = e.target.value;
                         if (value === "") {
-                          handlePriceChange(item.id, null as any);
+                          handlePriceChange(item.id, null as unknown as number);
                         } else {
                           handlePriceChange(item.id, Number(value));
                         }
