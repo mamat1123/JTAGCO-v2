@@ -203,7 +203,6 @@ export function CreateEventPage() {
       SUB_TYPE_CODES.QUOTATION_OLD,
       SUB_TYPE_CODES.PO_NEW,
       SUB_TYPE_CODES.PO_OLD,
-      SUB_TYPE_CODES.VISIT_SEND_SAMPLE,
     ];
     return (requiresImageTypes as string[]).includes(subTypeCode);
   }, [subTypeCode]);
@@ -588,29 +587,31 @@ export function CreateEventPage() {
               />
             )}
 
-            <div className="space-y-2">
-              <Label>รูปภาพกิจกรรม{requireImages && ' *'}</Label>
-              <div className={formSubmitted && requireImages && formData.image_urls.length === 0 ? 'border border-destructive rounded-md p-1' : ''}>
-                <ImageUploader
-                  multiple={true}
-                  onImageUploaded={(urls) => setFormData({ ...formData, image_urls: urls })}
-                  onImageRemoved={() => {
-                    if (formData.image_urls.length > 0) {
-                      setFormData(prev => ({ ...prev, image_urls: prev.image_urls }));
-                    } else {
-                      setFormData(prev => ({ ...prev, image_urls: [] }));
-                    }
-                  }}
-                  maxSizeMB={5}
-                  bucketName="events"
-                  folderPath={company.id.toString()}
-                  className="w-full"
-                />
+            {requireImages && (
+              <div className="space-y-2">
+                <Label>รูปภาพกิจกรรม{requireImages && ' *'}</Label>
+                <div className={formSubmitted && requireImages && formData.image_urls.length === 0 ? 'border border-destructive rounded-md p-1' : ''}>
+                  <ImageUploader
+                    multiple={true}
+                    onImageUploaded={(urls) => setFormData({ ...formData, image_urls: urls })}
+                    onImageRemoved={() => {
+                      if (formData.image_urls.length > 0) {
+                        setFormData(prev => ({ ...prev, image_urls: prev.image_urls }));
+                      } else {
+                        setFormData(prev => ({ ...prev, image_urls: [] }));
+                      }
+                    }}
+                    maxSizeMB={5}
+                    bucketName="events"
+                    folderPath={company.id.toString()}
+                    className="w-full"
+                  />
+                </div>
+                {formSubmitted && requireImages && formData.image_urls.length === 0 && (
+                  <p className="text-sm text-destructive">กรุณาอัปโหลดรูปภาพ</p>
+                )}
               </div>
-              {formSubmitted && requireImages && formData.image_urls.length === 0 && (
-                <p className="text-sm text-destructive">กรุณาอัปโหลดรูปภาพ</p>
-              )}
-            </div>
+            )}
 
             <ProductTagSelector
               products={products}
