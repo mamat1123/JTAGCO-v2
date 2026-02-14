@@ -327,6 +327,7 @@ export function EventDetailModal({ event, onClose, onDelete }: EventDetailModalP
       SUB_TYPE_CODES.FOUND_PROBLEM,
       SUB_TYPE_CODES.OTHER,
       SUB_TYPE_CODES.TEST_RESULT,
+      SUB_TYPE_CODES.VISIT_SEND_SAMPLE
     ] as string[]).includes(subTypeCode);
   }, [subTypeCode]);
 
